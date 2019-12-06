@@ -1,16 +1,30 @@
 import React, { Component } from 'react';
+import FormBecomeNoteTaker from './Components/FormBecomeNoteTaker'
+import FormINeedNoteTaker from './Components/FormINeedNoteTaker'
 
 class App extends Component {
 
+    constructor(props){
+        super(props)
+
+        this.state = {
+            printFormBecomeNoteTaker: false,
+            printFormINeedNoteTaker: false,
+        }
+
+    }
+
     handleINeedNoteTaker = () => {
-        console.log("J'ai besoin d'un preneur de note")
+      this.setState({printFormINeedNoteTaker: true})
+      this.setState({printFormBecomeNoteTaker: false})
     }
 
     handleBecomeNoteTaker = () => {
-        console.log("Je veux devenir un preneur de note")
+        this.setState({printFormBecomeNoteTaker: true})
+        this.setState({printFormINeedNoteTaker: false})
     }
 
-    render() 
+    render()
     {
         return(
             <div style={styles.main_container}>
@@ -18,20 +32,20 @@ class App extends Component {
                     <button style={styles.connexion_button}>Connexion</button>
                 </div>
                 <div style={styles.inscription}>
-                    <div 
+                    <div
                         style={styles.I_need_note_taker}
                         onClick={this.handleINeedNoteTaker}
                         >
+                        <FormINeedNoteTaker printFormINeedNoteTaker = {this.state.printFormINeedNoteTaker}/>
                     </div>
-                    <div 
+                    <div
                         style={styles.become_note_taker}
                         onClick={this.handleBecomeNoteTaker}
                         >
+                        <FormBecomeNoteTaker printFormBecomeNoteTaker = {this.state.printFormBecomeNoteTaker}/>
                     </div>
+
                 </div>
-                <p style = {{position: "fixed", top: "60%", left: "25%",  transform: "translate(-50%, -50%)"}}>J'ai besoin d'un preneur de note</p>
-                <p style = {{position: "fixed", top: "60%", left: "75%",  transform: "translate(-50%, -50%)"}}>Je veux devenir preneur de note</p>
-                <p style = {{position: "fixed", top: "50%", left: "50%",  transform: "translate(-50%, -50%)"}}>⬅️ Inscription ➡️</p>
             </div>
         );
     }
@@ -45,20 +59,22 @@ const styles = {
         height: "90vh"
     },
     nav: {
-        backgroundColor: 'yellow',
+        backgroundColor: 'red',
         width: '100%',
         height: '10vh   '
     },
     inscription: {
-        display: 'flex'
+        display: 'flex',
+        backgroundImage: "url(" + "https://imagesia.com/images/2019/12/06/background2.png" + ")",
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat'
     },
     become_note_taker: {
-        backgroundColor: 'green',
         width: '50%',
         height: '90vh'
     },
     I_need_note_taker: {
-        backgroundColor: 'purple',
         width: '50%',
         height: '90vh'
     },
@@ -66,7 +82,7 @@ const styles = {
         backgroundColor: 'red',
         border: '2px solid black',
         borderRadius: '10px',
-        position: 'fixed', 
+        position: 'fixed',
         right: '0%',
         top: '5%',
         transform: "translate(-50%, -50%)"
