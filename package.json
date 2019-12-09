@@ -1,0 +1,25 @@
+{
+  "name": "nh",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThomLlobEce/nh.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ThomLlobEce/nh/issues"
+  },
+  "homepage": "https://github.com/ThomLlobEce/nh#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.16.3",
+    "firebase-admin": "^8.8.0"
+  }
+}
