@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 
-export default class FormINeedNoteTaker extends Component {
+export default class FormSignUp extends Component {
 
     constructor(props){
         super(props)
@@ -29,11 +29,12 @@ export default class FormINeedNoteTaker extends Component {
         console.log(response.data)
     }
 
-    printFormINeedNoteTaker = () => {
-        if (this.props.printFormINeedNoteTaker === true)
+    printFormSignUp = () => {
+        if (this.props.printFormSignUp === true)
         {
             return(
             <div style={styles.formulaire}>
+                    <button onClick={this.props.toggleSignUp} style={styles.cross}>X</button>
                     <label style={styles.legend}><span style={styles.number}>1</span> Identité</label>
                     <br/>
                     <input type="text" placeholder="Nom" style={styles.textArea} value={this.state.last_name} onChange = {(event) => {this.setState({last_name: event.target.value})}}/>
@@ -54,7 +55,7 @@ export default class FormINeedNoteTaker extends Component {
                     <br/>
                     <textarea type="text" placeholder="Disponibilités" style={styles.textArea} value={this.state.dispo} onChange = {(event) => {this.setState({dispo: event.target.value})}}/>
                     <br/><br/><br/>
-                    <button onClick={this.createUser} style={styles.submitButton}></button>
+                    <button onClick={this.createUser} style={styles.submitButton}>Envoyer</button>
             </div>)
       }else{
           return(<div></div>)
@@ -64,7 +65,7 @@ export default class FormINeedNoteTaker extends Component {
     render()
     {
         return(
-            <this.printFormINeedNoteTaker/>
+            <this.printFormSignUp/>
         );
     }
 }
@@ -81,14 +82,13 @@ const styles = {
     	padding: 20,
     	backgroundColor: '#f4f7f8',
     	margin: 10,
-    	backgroundColor: '#f4f7f8',
     	borderRadius: 8,
     	fontFamily: "Georgia"
     },
 
     number:{
         background: '#1abc9c',
-    	color: '#fff',
+    	color: '#FFF',
     	height: 30,
     	width: 30,
     	display: 'inline-block',
@@ -101,6 +101,7 @@ const styles = {
 
     legend:{
         fontSize: 20,
+        color: '#1abc9c',
     },
 
     textArea: {
@@ -137,6 +138,14 @@ const styles = {
         border: '1px solid #16a085',
         borderWidth: '1px 1px 3px',
         marginBottom: 10
+    },
+
+    cross: {
+        position: 'absolute',
+        top: 5,
+        right: 5,
+        border: "none",
+        backgroundColor: '#f4f7f8',
     }
 
     }

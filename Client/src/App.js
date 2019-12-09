@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import FormBecomeNoteTaker from './Components/FormBecomeNoteTaker'
-import FormINeedNoteTaker from './Components/FormINeedNoteTaker'
+import FormSignUp from './Components/FormSignUp'
 
 class App extends Component {
 
@@ -8,20 +7,13 @@ class App extends Component {
         super(props)
 
         this.state = {
-            printFormBecomeNoteTaker: false,
-            printFormINeedNoteTaker: false,
+            printFormSignUp: false,
         }
 
     }
 
-    handleINeedNoteTaker = () => {
-      this.setState({printFormINeedNoteTaker: true})
-      this.setState({printFormBecomeNoteTaker: false})
-    }
-
-    handleBecomeNoteTaker = () => {
-        this.setState({printFormBecomeNoteTaker: true})
-        this.setState({printFormINeedNoteTaker: false})
+    toggleSignUp = () => {
+        this.setState({printFormSignUp: !this.state.printFormSignUp})
     }
 
     render()
@@ -34,15 +26,15 @@ class App extends Component {
                 <div style={styles.inscription}>
                 <button
                     style={styles.I_need_note_taker}
-                    onClick={this.handleINeedNoteTaker}
+                    onClick={this.toggleSignUp}
                     >I need a note taker
-                    <FormINeedNoteTaker printFormINeedNoteTaker = {this.state.printFormINeedNoteTaker}/>
+                    <FormSignUp printFormSignUp = {this.state.printFormSignUp} role = {"NEED"}/>
                 </button>
                 <button
                     style={styles.become_note_taker}
-                    onClick={this.handleBecomeNoteTaker}
+                    onClick={this.toggleSignUp}
                     >I want to become a note taker
-                    <FormBecomeNoteTaker printFormBecomeNoteTaker = {this.state.printFormBecomeNoteTaker}/>
+                    <FormSignUp printFormSignUp = {this.state.printFormSignUp} role = {"BECOME"}/>
                 </button>
                 </div>
             </div>
@@ -54,11 +46,10 @@ export default App;
 
 const styles = {
     main_container: {
-        width: "100%",
-        height: "90vh"
+        width: "100%"
     },
     nav: {
-        backgroundColor: 'red',
+        backgroundColor: '#1abc9c',
         width: '100%',
         height: '10vh'
     },
@@ -98,8 +89,11 @@ const styles = {
 	    color: '#fff'
     },
     connexion_button: {
-        backgroundColor: 'red',
+        backgroundColor: '#1abc9c',
+        height: 40,
+        width: 150,
         border: '2px solid black',
+        font: 'bold 17px Arial',
         borderRadius: '10px',
         position: 'fixed',
         right: '0%',
