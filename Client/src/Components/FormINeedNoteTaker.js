@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios'
 
 export default class FormINeedNoteTaker extends Component {
 
@@ -6,14 +7,26 @@ export default class FormINeedNoteTaker extends Component {
         super(props)
 
         this.state = {
-            need_nom: "",
-            need_prenom: "",
-            need_ufr: "",
-            need_year: "",
-            need_cm: "",
-            need_dispo: ""
+            last_name: "",
+            first_name: "",
+            ufr: "",
+            year: "",
+            cm: "",
+            dispo: "",
+            password: "default"
         }
 
+    }
+
+    createUser = async () => {
+
+        const response = await axios.post(
+            '/api/createUser',
+            this.state,
+            { headers: { 'Content-Type': 'application/json' } }
+          )
+
+        console.log(response.data)
     }
 
     printFormINeedNoteTaker = () => {
@@ -21,30 +34,28 @@ export default class FormINeedNoteTaker extends Component {
         {
             return(
             <div style={styles.formulaire}>
-                <form onSubmit={this.handleSubmit}>
                     <label style={styles.legend}><span style={styles.number}>1</span> Identité</label>
                     <br/>
-                    <input type="text" placeholder="Nom" style={styles.textArea} value={this.state.need_nom} onChange = {(event) => {this.setState({need_nom: event.target.value})}}/>
+                    <input type="text" placeholder="Nom" style={styles.textArea} value={this.state.last_name} onChange = {(event) => {this.setState({last_name: event.target.value})}}/>
                     <br/>
-                    <input type="text" placeholder="Prénom" style={styles.textArea} value={this.state.need_prenom} onChange = {(event) => {this.setState({need_prenom: event.target.value})}}/>
+                    <input type="text" placeholder="Prénom" style={styles.textArea} value={this.state.first_name} onChange = {(event) => {this.setState({first_name: event.target.value})}}/>
                     <br/>
                     <br/>
                     <label style={styles.legend}><span style={styles.number}>2</span> Informations Etudiantes</label>
                     <br/>
-                    <input type="text" placeholder="UFR" style={styles.textArea} value={this.state.need_ufr} onChange = {(event) => {this.setState({need_ufr: event.target.value})}}/>
+                    <input type="text" placeholder="UFR" style={styles.textArea} value={this.state.ufr} onChange = {(event) => {this.setState({ufr: event.target.value})}}/>
                     <br/>
-                    <input type="text" placeholder="Année" style={styles.textArea} value={this.state.need_year} onChange = {(event) => {this.setState({need_year: event.target.value})}}/>
+                    <input type="text" placeholder="Année" style={styles.textArea} value={this.state.year} onChange = {(event) => {this.setState({year: event.target.value})}}/>
                     <br/>
-                    <input type="text" placeholder="CM" style={styles.textArea} value={this.state.need_cm} onChange = {(event) => {this.setState({need_cm: event.target.value})}}/>
+                    <input type="text" placeholder="CM" style={styles.textArea} value={this.state.cm} onChange = {(event) => {this.setState({cm: event.target.value})}}/>
                     <br/>
                     <br/>
                     <label style={styles.legend}><span style={styles.number}>3</span> Disponibilités</label>
                     <br/>
-                    <textarea type="text" placeholder="Disponibilités" style={styles.textArea} value={this.state.need_dispo} onChange = {(event) => {this.setState({need_dispo: event.target.value})}}/>
+                    <textarea type="text" placeholder="Disponibilités" style={styles.textArea} value={this.state.dispo} onChange = {(event) => {this.setState({dispo: event.target.value})}}/>
                     <br/><br/><br/>
-                     <input type="submit" value="Envoyer" />
-              </form>
-          </div>)
+                    <button onClick={this.createUser}></button>
+            </div>)
       }else{
           return(<div></div>)
       }
