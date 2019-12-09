@@ -32,19 +32,18 @@ class App extends Component {
                     <button style={styles.connexion_button}>Connexion</button>
                 </div>
                 <div style={styles.inscription}>
-                    <div
-                        style={styles.I_need_note_taker}
-                        onClick={this.handleINeedNoteTaker}
-                        >
-                        <FormINeedNoteTaker printFormINeedNoteTaker = {this.state.printFormINeedNoteTaker}/>
-                    </div>
-                    <div
-                        style={styles.become_note_taker}
-                        onClick={this.handleBecomeNoteTaker}
-                        >
-                        <FormBecomeNoteTaker printFormBecomeNoteTaker = {this.state.printFormBecomeNoteTaker}/>
-                    </div>
-
+                <button
+                    style={styles.I_need_note_taker}
+                    onClick={this.handleINeedNoteTaker}
+                    >I need a note taker
+                    <FormINeedNoteTaker printFormINeedNoteTaker = {this.state.printFormINeedNoteTaker}/>
+                </button>
+                <button
+                    style={styles.become_note_taker}
+                    onClick={this.handleBecomeNoteTaker}
+                    >I want to become a note taker
+                    <FormBecomeNoteTaker printFormBecomeNoteTaker = {this.state.printFormBecomeNoteTaker}/>
+                </button>
                 </div>
             </div>
         );
@@ -61,22 +60,42 @@ const styles = {
     nav: {
         backgroundColor: 'red',
         width: '100%',
-        height: '10vh   '
+        height: '10vh'
     },
     inscription: {
+        width: '100%',
+        height: '90vh',
         display: 'flex',
-        backgroundImage: "url(" + "https://imagesia.com/images/2019/12/06/background2.png" + ")",
+        backgroundImage: "url(" + "https://www.bloghoptoys.fr/wp-content/uploads/2018/07/handicap-etudiant-mesures.jpg" + ")",
         backgroundPosition: 'center',
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat'
     },
     become_note_taker: {
-        width: '50%',
-        height: '90vh'
+        position: 'absolute',
+        width: 200,
+        height: 50,
+        left: '45%',
+        top: '55%',
+        border: 'none',
+	    padding: 6,
+	    borderRadius: 8,
+	    background: '#109177',
+	    font: 'bold 13px Arial',
+	    color: '#fff'
     },
     I_need_note_taker: {
-        width: '50%',
-        height: '90vh'
+        position: 'absolute',
+        width: 200,
+        height: 50,
+        left: '45%',
+        top: '65%',
+        border: 'none',
+	    padding: 6,
+	    borderRadius: 8,
+	    background: '#109177',
+	    font: 'bold 13px Arial',
+	    color: '#fff'
     },
     connexion_button: {
         backgroundColor: 'red',
