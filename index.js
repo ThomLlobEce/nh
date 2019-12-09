@@ -14,7 +14,7 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 // An api endpoint that returns a short list of items
 app.post('/api/createUser', (req,res) => {
 
-    users.push({name: req.body.name, password: req.body.password})
+    users.push({name: req.body.last_name, password: req.body.password})
 
     console.log(users)
 
