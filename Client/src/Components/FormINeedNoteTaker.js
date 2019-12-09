@@ -54,7 +54,7 @@ export default class FormINeedNoteTaker extends Component {
                     <br/>
                     <textarea type="text" placeholder="Disponibilités" style={styles.textArea} value={this.state.dispo} onChange = {(event) => {this.setState({dispo: event.target.value})}}/>
                     <br/><br/><br/>
-                    <button onClick={this.createUser}></button>
+                    <button onClick={this.createUser} style={styles.submitButton}></button>
             </div>)
       }else{
           return(<div></div>)
@@ -73,9 +73,9 @@ const styles = {
 
     formulaire: {
         width: '20%',
-        height: '80vh',
-        left: '15%',
-        top: '15%',
+        height: '90vh',
+        left: '37%',
+        top: '10%',
         position: 'fixed',
         zIndex: 2,
     	padding: 20,
@@ -120,5 +120,23 @@ const styles = {
     	color: '#8a97a0',
     	webkitBoxShadow: "rgba(0,0,0,0.03)",
     	boxShadow: "rgba(0,0,0,0.03)",
-    	marginBottom: 30}
+    	marginBottom: 30
+    },
+
+    submitButton: {
+        position: 'relative',
+	    display: 'block',
+	    padding: '19px 39px 18px 39px',
+        color: '#FFF',
+        margin: 'auto',
+        background: '#1abc9c',
+        fontSize: 18,
+        textAlign: 'center',
+        fontStyle: 'normal',
+        width: '100%',
+        border: '1px solid #16a085',
+        borderWidth: '1px 1px 3px',
+        marginBottom: 10
+    }
+
     }
