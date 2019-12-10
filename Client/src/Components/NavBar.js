@@ -9,7 +9,7 @@ export default class NavBar extends Component {
         return(
             <div style={styles.nav}>
                 <Link to = {"/"}>
-                    <img src={logo} height={"100%"} style={{marginLeft: 30}} />
+                    <img src={logo} height={"100%"} style={{marginLeft: 30}} alt={"Logo"}/>
                 </Link>
                 {
                     this.props.logged ? 
