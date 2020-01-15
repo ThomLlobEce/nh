@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios'
+import {withRouter, Redirect} from 'react-router-dom'
 
-export default class FormSignUp extends Component {
+export default withRouter(class FormSignUp extends Component {
 
     constructor(props){
         super(props)
@@ -62,6 +63,7 @@ export default class FormSignUp extends Component {
                 { headers: { 'Content-Type': 'application/json' } }
             )
             console.log(response.data)
+            this.props.connexion()
         }else{
             console.log("Unable to sign up. Data is not correctly formatted.")
         }
@@ -106,7 +108,17 @@ export default class FormSignUp extends Component {
                     <input type="password" placeholder="Mot de passe" style={styles.textArea} value={this.state.password} onChange = {(event) => {this.setState({password: event.target.value})}}/>
                     {this.state.error[6] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[6]}<br /></div>) : (<br />)}
                     <br/>< br/>
-                    <button onClick={this.createUser} style={styles.submitButton}>Envoyer</button>
+                    <div
+                        onMouseOut={() => this.setState({submitOver: false})} 
+                        onMouseOver={() => this.setState({submitOver: true})}
+                        >
+                            {
+                                this.state.submitOver ?
+                                    <button onClick={this.createUser} style={styles.submitButton_over}>Envoyer</button>
+                                    :
+                                    <button onClick={this.createUser} style={styles.submitButton}>Envoyer</button>
+                            }
+                    </div>
                 </div>
             </div>)
       }else{
@@ -120,7 +132,7 @@ export default class FormSignUp extends Component {
             <this.printFormSignUp/>
         );
     }
-}
+})
 
 const styles = {
 
@@ -135,11 +147,11 @@ const styles = {
     	margin: 10,
     	borderRadius: 8,
     	fontFamily: "Georgia",
-        transform: "translate(-50%, -50%)"
+        transform: "translate(-50%, -60%)"
     },
 
     number:{
-        background: '#1abc9c',
+        background: '#EC670A',
     	color: '#FFF',
     	height: 30,
     	width: 30,
@@ -153,7 +165,7 @@ const styles = {
 
     legend:{
         fontSize: 20,
-        color: '#1abc9c',
+        color: '#EC670A',
     },
 
     textArea: {
@@ -182,12 +194,28 @@ const styles = {
 	    padding: '19px 39px 18px 39px',
         color: '#FFF',
         margin: 'auto',
-        background: '#1abc9c',
+        background: '#EC670A',
         fontSize: 18,
         textAlign: 'center',
         fontStyle: 'normal',
         width: '100%',
-        border: '1px solid #16a085',
+        border: '1px solid #EC670A',
+        borderWidth: '1px 1px 3px',
+        marginBottom: 10
+    },
+
+    submitButton_over: {
+        position: 'relative',
+	    display: 'block',
+	    padding: '19px 39px 18px 39px',
+        color: '#FFF',
+        margin: 'auto',
+        background: '#EC8E0A',
+        fontSize: 18,
+        textAlign: 'center',
+        fontStyle: 'normal',
+        width: '100%',
+        border: '1px solid #EC8E0A',
         borderWidth: '1px 1px 3px',
         marginBottom: 10
     },

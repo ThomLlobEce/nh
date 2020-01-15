@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import FormSignUp from './FormSignUp'
-
 import NavBar from './NavBar'
+import HomeInformationItem from './HomeInformationItem'
+import Rima from '../Images/Rima.png'
+import SignUp from './SignUp'
+import FormSignIn from './FormSignIn';
 
 class App extends Component {
 
@@ -10,9 +12,14 @@ class App extends Component {
 
         this.state = {
             printNeed: false,
-            printBecome: false
+            printBecome: false,
+            overNeed: false,
+            overBecome: false,
+            sign: false // false = forms for sign up, true = form for sign in
         }
 
+        this.whoAreWe = React.createRef()
+        this.howDoesItWork = React.createRef()
     }
 
     toggleNeed = () => {
@@ -22,24 +29,65 @@ class App extends Component {
     toggleBecome = () => {
         this.setState({printBecome: !this.state.printBecome})
     }
+
+    moveTo = (i) => {
+        switch(i){
+            case 0:
+                window.scrollTo(0, this.whoAreWe.current.offsetTop);
+                break;
+            case 1:
+                window.scrollTo(0, this.howDoesItWork.current.offsetTop);
+                break;
+        }
+
+    }
+
     render()
     {
         return(
             <div>
-                <NavBar logged={false}/>
-                <div style={styles.inscription}>
-                    <button
-                        style={styles.need}
-                        onClick={this.toggleNeed}
-                        >Je recherche un preneur de note
-                    </button>
-                    <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.state.printNeed} role = {"NEED"} toggleSignUp = {this.toggleNeed} />
-                    <button
-                        style={styles.become}
-                        onClick={this.toggleBecome}
-                        >Je veux devenir preneur de note
-                    </button>
-                    <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.state.printBecome} role = {"BECOME"} toggleSignUp = {this.toggleBecome}/>
+                <NavBar logged={false} moveTo = {(index) => {this.moveTo(index)}} connexion = {() => this.setState({sign: true})}/>
+                <div style={styles.forms} >
+                    {
+                        this.state.sign ?
+                        <FormSignIn 
+                            style={{zIndex: 2}} 
+                            addUser={this.props.addUser}
+                            inscription={() => this.setState({sign: false})}
+                        />
+                        :
+                        <SignUp
+                            mouseOutNeed={() => this.setState({overNeed: false})}
+                            mouseOverNeed={() => this.setState({overNeed: true})}
+                            overNeed = {this.state.overNeed}
+                            toggleNeed = {this.toggleNeed}
+                            printNeed = {this.state.printNeed}
+                            mouseOutBecome={() => this.setState({overBecome: false})}
+                            mouseOverBecome={() => this.setState({overBecome: true})}
+                            overBecome = {this.state.overBecome}
+                            toggleBecome = {this.toggleBecome}
+                            printBecome = {this.state.printBecome}
+                            connexion = {() => this.setState({sign: true, printBecome: false, printNeed: false})}
+                        />
+                    }
+                </div>
+                <div style={styles.footer}>
+                    <div ref = {this.whoAreWe}>
+                        <HomeInformationItem
+                            title = {"Qui sommes-nous ?"}
+                            subtitle = {"Nanterre hangagée ! Une association de l'université de Nanterre ayant pour but de sensibiliser la communauté universitaire à la question du handicap."}
+                            p = {"Notamment, nous mettons en place des actions d'accompagnement et de formations ... comme celle-ci !\nVoici quelques visages de l'association :  "}
+                            srcImage = {Rima}
+                            name = {"Rima Chihi"}
+                            status = {"Présidente"}
+                        />
+                    </div>
+                    <div ref = {this.howDoesItWork}>
+                        <HomeInformationItem
+                            title = {"Comment ça marche ?"}
+                            subtitle = {"En 3 étapes ! Inscription, Synchronisation et Match !"}
+                        />
+                    </div>
                 </div>
             </div>
         );
@@ -49,9 +97,9 @@ class App extends Component {
 export default App;
 
 const styles = {
-    inscription: {
+    forms: {
         width: '100%',
-        height: '110vh',
+        height: '85vh',
         display: 'flex',
         backgroundImage: "url(https://www.bloghoptoys.fr/wp-content/uploads/2018/07/handicap-etudiant-mesures.jpg)",
         backgroundPosition: 'center',
@@ -59,32 +107,8 @@ const styles = {
         backgroundRepeat: 'no-repeat',
         zIndex: 1
     },
-    need: {
-        position: 'absolute',
-        width: 300,
-        height: 50,
-        left: '50%',
-        top: '45%',
-        border: 'none',
-	    padding: 6,
-	    borderRadius: 8,
-	    background: '#109177',
-	    font: 'bold 13px Arial',
-        color: '#fff',
-        transform: "translate(-50%, -50%)"   
-    },
-    become: {
-        position: 'absolute',
-        width: 300,
-        height: 50,
-        left: '50%',
-        top: '55%',
-        border: 'none',
-	    padding: 6,
-	    borderRadius: 8,
-	    background: '#109177',
-	    font: 'bold 13px Arial',
-        color: '#fff',
-        transform: "translate(-50%, -50%)"   
+    footer: {
+        width: '100%',
+        height: '100vh'
     }
 }
