@@ -19,7 +19,7 @@ var users = [new User("Llobregat", "Thomas", "a@gmail.com", "54", 2020, "gter", 
 var auths = [];
 app.use(bodyParser.json());
 // Serve the static files from the React app
-app.use(express.static(path.join(__dirname, 'client/build')));
+app.use(express.static(path.join(__dirname, 'Client/build')));
 // API that can create an user if it has the required informations and add it into users array
 app.post('/api/createUser', function (req, res) {
     console.log("*** API REQUEST (POST) : /api/createUser ***");
@@ -134,7 +134,7 @@ app.get('/api/disconnect', function (req, res) {
 });
 // Handles any requests that don't match the ones above
 app.get('*', function (req, res) {
-    res.sendFile(path.join(__dirname + '/client/build/index.html'));
+    res.sendFile(path.join(__dirname + '/Client/build/index.html'));
 });
 var port = process.env.PORT || 5000;
 app.listen(port);
