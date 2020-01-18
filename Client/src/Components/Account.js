@@ -64,6 +64,7 @@ class Account extends Component {
         .then( (res) => {
             if(res.data.message === true){
                 this.setState({readyToRender: true, logged: true})
+                this.getIcalData()
             }
             else{
                 
