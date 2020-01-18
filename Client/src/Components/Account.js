@@ -16,6 +16,44 @@ class Account extends Component {
     state = {
         readyToRender: false, // false while fetching API data, true when ready to render
         logged: false, // Wether there is a logged user
+        ical: '', // contains the ical value of the ical form
+        timetable: []
+    }
+
+    getIcalData = async () => {
+        await axios.get(
+            '/api/getIcalData?email='+this.props.user.email
+        )
+        .then( (res) => {
+            if(res.data.status === 'success'){
+                console.log("Data has been successfully gotten from ical")
+                this.setState({timetable: res.data.message})
+            }
+            else{
+                console.log("Error while getting ical data " + res.data.message)
+            }
+        })
+        .catch(error => { console.log(error)})
+    }
+
+    addIcal = async () => {
+        await axios.post(
+            '/api/addIcalToUser',
+            {
+                email: this.props.user.email,
+                ical: this.state.ical
+            },
+            { headers: { 'Content-Type': 'application/json' } }
+        )
+        .then( (res) => {
+            if(res.data.status === 'success'){
+                this.getIcalData()
+            }
+            else{
+                console.log("Error while adding ical " + res.data.message)
+            }
+        })
+        .catch(error => { console.log(error)})
     }
 
     // Trying to know if the client user is authed on server-side
@@ -49,7 +87,31 @@ class Account extends Component {
                         this.state.logged ? 
                             <div>
                                 <NavBar logged={true} disconnect={this.props.disconnect} />
-                                <h1 style={{color: "red"}}>HELLO</h1>
+                                <div style={{display: 'flex', marginTop: 50}}>
+                                    <label> ICAL : 
+                                        <input 
+                                            type="text" 
+                                            name="ical" 
+                                            value={this.state.ical} 
+                                            onChange={(event) => this.setState({ical: event.target.value})} 
+                                            placeholder="https://[...].ics" 
+                                            />
+                                    </label>
+                                    <button onClick={this.addIcal}>GO</button>
+                                </div>
+                                <div style={{display: 'inline'}}>
+                                    {
+                                        this.state.timetable.map( (value) => {
+                                            return(
+                                                <div>
+                                                    <h3>{value.title}</h3>
+                                                    {value.location}
+                                                    {'Du ' + value.startDay + '/' + value.startMonth + '/' + value.startYear + ' à ' + value.startHours + 'h' + value.startMinutes + ' au ' + value.endDay + '/' + value.endMonth + '/' + value.endYear + ' à ' + value.endHours + 'h' + value.endMinutes}
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                </div>
                             </div>
                             : 
                             <div>
