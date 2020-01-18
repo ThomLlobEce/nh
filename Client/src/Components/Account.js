@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import NavBar from './NavBar'
-import { Link } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import axios from 'axios'
 
 // Dashboard view
@@ -86,7 +86,7 @@ class Account extends Component {
                         this.state.readyToRender ?
                         this.state.logged ? 
                             <div>
-                                <NavBar logged={true} disconnect={this.props.disconnect} />
+                                <NavBar logged={true} />
                                 <div style={{display: 'flex', marginTop: 50}}>
                                     <label> ICAL : 
                                         <input 
@@ -115,10 +115,7 @@ class Account extends Component {
                             </div>
                             : 
                             <div>
-                                <NavBar logged={false} />
-                                <div style={styles.inscription}>
-                                    <h1 style={styles.back_button}>You are not logged in. <Link to = {'/signin'} style={{color: 'blue'}}>Please sign in</Link> or <Link to="/" style={{color: 'blue'}}>create an account</Link></h1>
-                                </div>
+                                <Redirect to="/" />
                             </div>
                             : 
                             null
