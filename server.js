@@ -43,8 +43,12 @@ var bodyParser = require('body-parser');
 var user_1 = require("./user");
 var functions_1 = require("./functions");
 // https://planning-paris.inseecu.net/Telechargements/ical/Edt_LLOBREGAT.ics?version=2019.0.4.0&idICal=ED8C99CB6BE8F57EC536877E01FC1D6F&param=643d5b312e2e36325d2666683d3126663d31
-var users = [new user_1["default"]("Llobregat", "Thomas", "a@gmail.com", "54", 2020, "gter", "a")];
+var users = [
+    new user_1["default"]("Llobregat", "Thomas", "a@gmail.com", "54", 2020, "gter", "a", true),
+    new user_1["default"]("Babel", "Mattis", "b@gmail.com", "54", 2020, "gter", "b", false)
+];
 var auths = [];
+var eventRequiringHelpers = [];
 app.use(bodyParser.json());
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'Client/build')));
@@ -54,7 +58,7 @@ app.post('/api/createUser', function (req, res) {
     console.log("Parameters given : " + req.body);
     var exist = false;
     var missingParams = false;
-    if (!req.body.email || !req.body.first_name || !req.body.last_name || !req.body.ufr || !req.body.year || !req.body.cm || !req.body.password) {
+    if (!req.body.email || !req.body.first_name || !req.body.last_name || !req.body.ufr || !req.body.year || !req.body.cm || !req.body.password || req.body.need) {
         missingParams = true;
     }
     else {
@@ -81,7 +85,7 @@ app.post('/api/createUser', function (req, res) {
     }
     else {
         console.log(req.body.email + " has successfully been created.");
-        users.push(new user_1["default"](req.body.last_name, req.body.first_name, req.body.email, req.body.ufr, req.body.year, req.body.cm, req.body.password));
+        users.push(new user_1["default"](req.body.last_name, req.body.first_name, req.body.email, req.body.ufr, req.body.year, req.body.cm, req.body.password, req.body.need));
         res.json({
             status: "success",
             message: "User added"
@@ -131,18 +135,26 @@ app.get('/api/signIn', function (req, res) {
 app.get('/api/isAuth', function (req, res) {
     console.log("*** API REQUEST (GET) : /api/isAuth ***");
     var auth = false;
+    var need = null;
     for (var i = 0; i < auths.length; i++) {
         if (auths[i] === req.query.email) {
-            auth = true;
+            for (var j = 0; j < users.length; j++) {
+                if (users[j].email === auths[i]) {
+                    auth = true;
+                    need = users[j].need;
+                    break;
+                }
+            }
+            break;
         }
     }
     if (auth) {
         console.log(req.query.email + " is already authenticated.");
-        res.json({ status: "success", message: auth });
+        res.json({ status: "success", message: need });
     }
     else {
         console.log(req.query.email + " is not authenticated.");
-        res.json({ status: "failed", message: auth });
+        res.json({ status: "failed", message: "User is not authenticated" });
     }
 });
 // API that disconnect a user based on the provided email. So it removes it from auths array.
@@ -284,6 +296,59 @@ app.get('/api/getIcalData', function (req, res) {
                     _a.label = 6;
                 case 6: return [2 /*return*/];
             }
+        });
+    });
+});
+app.post('/api/addHelpRequest', function (req, res) {
+    console.log("*** API REQUEST (GET) : /api/addIcalToUser ***");
+    console.log("Parameters given : " + JSON.stringify(req.body));
+    var exist = false;
+    var missingParams = false;
+    // Verifying parameters
+    if (!req.body.requester || !req.body.event) {
+        missingParams = true;
+    }
+    else {
+        // Verifying that the helper exists
+        for (var i = 0; i < users.length; i++) {
+            if (users[i].email === req.body.requester.email) {
+                exist = true;
+                // Adding the user and the event to DB
+                eventRequiringHelpers.push({ requester: req.body.requester, event: req.body.event });
+                console.log("Event and requester correctly added to DB : " + JSON.stringify({ requester: req.body.requester, event: req.body.event }));
+            }
+        }
+    }
+    if (!exist) {
+        console.log("ERROR : No user " + req.body.requester.email + " exists");
+        res.json({
+            status: "failed",
+            message: "User does not exist"
+        });
+    }
+    else if (missingParams) {
+        console.log("ERROR : Not enough parameters given. Check readme.md to have more informations.");
+        res.json({
+            status: "failed",
+            message: "Missing parameters"
+        });
+    }
+    else {
+        res.json({
+            status: "success",
+            message: "Event correctly added to DB"
+        });
+    }
+});
+app.get('/api/getUpcommingEvents', function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            console.log("*** API REQUEST (GET) : /api/getUpcommingEvents ***");
+            res.json({
+                status: "success",
+                message: eventRequiringHelpers
+            });
+            return [2 /*return*/];
         });
     });
 });

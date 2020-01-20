@@ -13,7 +13,6 @@ export async function parseICALdata(user: User){
             ical.fromURL(user.ical, {}, function (err, data) {
                 for (let k in data) {
                     i++
-                    console.log(i + " --- " + Object.keys(data).length)
                     if (data.hasOwnProperty(k)) {
                         const ev = data[k];
                         if (data[k].type == 'VEVENT' && ev.summary && ev.location) {

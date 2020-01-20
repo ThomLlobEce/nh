@@ -28,7 +28,7 @@ class SignUp extends Component {
                     }            
                 </div>
                 
-                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.props.printNeed} role = {"NEED"} toggleSignUp = {this.props.toggleNeed} connexion = {this.props.connexion}/>
+                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.props.printNeed} role = {true} toggleSignUp = {this.props.toggleNeed} connexion = {this.props.connexion}/>
                 
                 <div
                     onMouseOut={this.props.mouseOutBecome} 
@@ -50,7 +50,7 @@ class SignUp extends Component {
                     }
                 </div>
                 
-                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.props.printBecome} role = {"BECOME"} toggleSignUp = {this.props.toggleBecome} connexion = {this.props.connexion}/>
+                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.props.printBecome} role = {false} toggleSignUp = {this.props.toggleBecome} connexion = {this.props.connexion}/>
             </div>
         )
     }

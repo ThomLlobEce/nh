@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "tsc": "tsc",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix Client && npm run build --prefix Client"
+    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix Client && npm run build --prefix Client",
+    "buildAndStart": "npm run build --prefix Client && npm run tsc server.ts && npm start"
   },
   "repository": {
     "type": "git",

@@ -59,7 +59,16 @@ export default withRouter(class FormSignUp extends Component {
             && this.state.error[5] === "" && this.state.error[6] === ""){
             const response = await axios.post(
                 '/api/createUser',
-                this.state,
+                {
+                    email: this.state.email,
+                    last_name: this.state.last_name,
+                    first_name: this.state.first_name,
+                    ufr: this.state.ufr,
+                    year: this.state.year,
+                    cm: this.state.cm,
+                    password: this.state.password,
+                    need: this.props.role,
+                },
                 { headers: { 'Content-Type': 'application/json' } }
             )
             console.log(response.data)

@@ -1,8 +1,9 @@
 "use strict";
 exports.__esModule = true;
 var User = /** @class */ (function () {
-    function User(name, firstName, email, ufr, year, cm, password) {
+    function User(name, firstName, email, ufr, year, cm, password, need) {
         var _this = this;
+        // SETTERS
         this.addIcal = function (ical) {
             _this.ical = ical;
         };
@@ -14,6 +15,7 @@ var User = /** @class */ (function () {
         this.cm = cm;
         this.password = password;
         this.ical = '';
+        this.need = need;
     }
     return User;
 }());

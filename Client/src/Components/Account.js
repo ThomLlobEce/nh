@@ -17,7 +17,48 @@ class Account extends Component {
         readyToRender: false, // false while fetching API data, true when ready to render
         logged: false, // Wether there is a logged user
         ical: '', // contains the ical value of the ical form
-        timetable: []
+        timetable: [],
+        showContextualMenu: false,
+        eventForContextualMenu: null,
+        need: null,
+        upcommingEventsLookingForHelper: []
+    }
+
+    requestHelp = async () => {
+        await axios.post(
+            '/api/addHelpRequest',
+            {
+                requester: this.props.user,
+                event: this.state.eventForContextualMenu
+            },
+            { headers: { 'Content-Type': 'application/json' } }
+        )
+        .then( (res) => {
+            if(res.data.status === 'success'){
+                console.log("Request has correctly been submited")
+                this.setState({showContextualMenu: false, eventForContextualMenu: null})
+            }
+            else{
+                console.log("Error while getting ical data " + res.data.message)
+            }
+        })
+        .catch(error => { console.log(error)})
+    }
+
+    getUpcommingEvents = async () => {
+        await axios.get(
+            '/api/getUpcommingEvents'
+        )
+        .then( (res) => {
+            if(res.data.status === 'success'){
+                console.log("Upcomming events correctly loaded")
+                this.setState({upcommingEventsLookingForHelper: res.data.message})
+            }
+            else{
+                console.log("Error while getting upcomming events " + res.data.message)
+            }
+        })
+        .catch(error => { console.log(error)})
     }
 
     getIcalData = async () => {
@@ -62,9 +103,12 @@ class Account extends Component {
             '/api/isAuth?email='+this.props.user.email
         )
         .then( (res) => {
-            if(res.data.message === true){
-                this.setState({readyToRender: true, logged: true})
-                this.getIcalData()
+            if(res.data.status === "success"){
+                this.setState({readyToRender: true, logged: true, need: res.data.message})
+                if(this.state.need)
+                    this.getIcalData()
+                else
+                    this.getUpcommingEvents()
             }
             else{
                 
@@ -88,31 +132,66 @@ class Account extends Component {
                         this.state.logged ? 
                             <div>
                                 <NavBar logged={true} />
-                                <div style={{display: 'flex', marginTop: 50}}>
-                                    <label> ICAL : 
-                                        <input 
-                                            type="text" 
-                                            name="ical" 
-                                            value={this.state.ical} 
-                                            onChange={(event) => this.setState({ical: event.target.value})} 
-                                            placeholder="https://[...].ics" 
-                                            />
-                                    </label>
-                                    <button onClick={this.addIcal}>GO</button>
-                                </div>
-                                <div style={{display: 'inline'}}>
-                                    {
-                                        this.state.timetable.map( (value) => {
-                                            return(
-                                                <div>
-                                                    <h3>{value.title}</h3>
-                                                    {value.location}
-                                                    {'Du ' + value.startDay + '/' + value.startMonth + '/' + value.startYear + ' à ' + value.startHours + 'h' + value.startMinutes + ' au ' + value.endDay + '/' + value.endMonth + '/' + value.endYear + ' à ' + value.endHours + 'h' + value.endMinutes}
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                </div>
+                                {
+                                    this.state.need ? 
+                                        // User looking for help
+                                        <div>
+                                            <div style={{display: 'flex', marginTop: 50}}>
+                                                <label> ICAL : 
+                                                    <input 
+                                                        type="text" 
+                                                        name="ical" 
+                                                        value={this.state.ical} 
+                                                        onChange={(event) => this.setState({ical: event.target.value})} 
+                                                        placeholder="https://[...].ics" 
+                                                        />
+                                                </label>
+                                                <button onClick={this.addIcal}>GO</button>
+                                            </div>
+                                            <div style={{display: 'inline'}}>
+                                                {
+                                                    this.state.timetable.map( (value) => {
+                                                        return(
+                                                            <div onClick={() => this.setState({showContextualMenu: true, eventForContextualMenu: value})}>
+                                                                <h3>{value.title}</h3>
+                                                                {value.location}
+                                                                {'Du ' + value.startDay + '/' + value.startMonth + '/' + value.startYear + ' à ' + value.startHours + 'h' + value.startMinutes + ' au ' + value.endDay + '/' + value.endMonth + '/' + value.endYear + ' à ' + value.endHours + 'h' + value.endMinutes}
+                                                            </div>
+                                                        )
+                                                    })
+                                                }
+                                            </div>
+                                            {
+                                                this.state.showContextualMenu ? 
+                                                    <div style={{width: 400, left: '50%', top: '50%', position: 'fixed', zIndex: 2, padding: 20, backgroundColor: '#f4f7f8', margin: 10, borderRadius: 8, fontFamily: "Georgia", transform: "translate(-50%, -50%)", shadowOffset:{  width: 20,  height: 20,  }, shadowColor: 'black', shadowOpacity: 1.0, border: '2px solid black'}}>
+                                                        <h3>{this.state.eventForContextualMenu.title}</h3>
+                                                        {this.state.eventForContextualMenu.location}
+                                                        {'Du ' + this.state.eventForContextualMenu.startDay + '/' + this.state.eventForContextualMenu.startMonth + '/' + this.state.eventForContextualMenu.startYear + ' à ' + this.state.eventForContextualMenu.startHours + 'h' + this.state.eventForContextualMenu.startMinutes + ' au ' + this.state.eventForContextualMenu.endDay + '/' + this.state.eventForContextualMenu.endMonth + '/' + this.state.eventForContextualMenu.endYear + ' à ' + this.state.eventForContextualMenu.endHours + 'h' + this.state.eventForContextualMenu.endMinutes}
+                                                        <div onClick={() => this.requestHelp()} style={{color: 'blue'}}>
+                                                            Rechercher un preneur de note pour cette horraire
+                                                        </div>
+                                                    </div>
+                                                    :
+                                                    null
+                                            }
+                                        </div>
+                                        :
+                                        // User looking for helping
+                                        <div>
+                                            {
+                                                this.state.upcommingEventsLookingForHelper.map( (value) => {
+                                                    return(
+                                                        <div>
+                                                            <h3>Prénom du requêtant {value.requester.firstName}</h3>
+                                                            <h4>Nom de l'évenement: {value.event.title}</h4>
+                                                            <h5>Lieu : {value.event.location}</h5>
+                                                            <h5>Date : Du {value.event.startDay}/{value.event.startMonth}/{value.event.startYear} au {value.event.endDay}/{value.event.endMonth}/{value.event.endYear} de {value.event.startHours}h{value.event.startMinutes} au {value.event.endHours}h{value.event.endMinutes}</h5>
+                                                        </div>
+                                                    )
+                                                })
+                                            }
+                                        </div>
+                                }
                             </div>
                             : 
                             <div>

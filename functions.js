@@ -51,7 +51,6 @@ function parseICALdata(user) {
                             ical.fromURL(user.ical, {}, function (err, data) {
                                 for (var k in data) {
                                     i++;
-                                    console.log(i + " --- " + Object.keys(data).length);
                                     if (data.hasOwnProperty(k)) {
                                         var ev = data[k];
                                         if (data[k].type == 'VEVENT' && ev.summary && ev.location) {
