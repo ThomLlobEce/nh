@@ -80,7 +80,7 @@ class App extends Component {
                         <HomeInformationItem
                             title = {"Qui sommes-nous ?"}
                             subtitle = {"Nanterre hangagée ! Une association de l'université de Nanterre ayant pour but de sensibiliser la communauté universitaire à la question du handicap."}
-                            p = {"Nanterre Hangagée est un programme qui a pour but de rapprocher un preneur de notes et un élève en situation de handicap. Pour les preneurs de notes, vos efforts ont vocation à être rémunérés. Si vous souhaitez participer à ce programme, ne vous inquiétez pas, la relation preneur de notes étudiants n'est pas automatique. Ainsi, dans cette optique vous ne serez pas engagés dès le premier cours.\nVoici quelques visages de l'association :  "}
+                            p = {"Nanterre Hangagée est un programme qui vise à rapprocher un preneur de notes et un élève en situation de handicap. Pour les preneurs de notes, vos efforts ont vocation à être rémunérés. Si vous souhaitez participer à ce programme, ne vous inquiétez pas, la relation preneur de notes étudiants n'est pas automatique. Ainsi, dans cette optique vous ne serez pas engagés dès le premier cours.\nVoici quelques visages de l'association :  "}
                             srcImage = {Rima}
                             name = {"Rima Chihi"}
                             status = {"Présidente"}
