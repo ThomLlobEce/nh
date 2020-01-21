@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import NavBar from './NavBar'
-import { Redirect } from 'react-router-dom';
 import axios from 'axios'
-import Needers from './Needers';
 
 // Components for /dashboard url, showing the helpers-only content
 class Helpers extends Component {

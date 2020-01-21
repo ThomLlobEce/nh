@@ -1,4 +1,4 @@
-import React, { Component, Profiler } from 'react';
+import React, { Component } from 'react';
 import NavBar from './NavBar'
 import { Redirect } from 'react-router-dom';
 import axios from 'axios'

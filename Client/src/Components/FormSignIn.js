@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-import { Redirect, Link} from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 import MouseOverButton from './MouseOverButton';
 
 /** Form for signing users in */
@@ -166,7 +166,6 @@ const styles = {
     },
 
     submitButton: {
-	    display: 'flex',
         color: '#FFF',
         margin: 'auto',
         background: '#EC670A',
@@ -177,13 +176,10 @@ const styles = {
         height: 40,
         border: '1px solid #EC670A',
         borderWidth: '1px 1px 3px',
-        marginBottom: 10,
-        alignItems: 'center',
-        justifyContent: 'center'
+        marginBottom: 10
     },
 
     submitButton_over: {
-	    display: 'flex',
         color: '#FFF',
         margin: 'auto',
         background: '#EC8E0A',
@@ -194,8 +190,6 @@ const styles = {
         height: 40,
         border: '1px solid #EC8E0A',
         borderWidth: '1px 1px 3px',
-        marginBottom: 10,
-        alignItems: 'center',
-        justifyContent: 'center'
+        marginBottom: 10
     }
 }

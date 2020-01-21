@@ -4,6 +4,7 @@ import HomeInformationItem from './HomeInformationItem'
 import Rima from '../Images/Rima.png'
 import SignUp from './SignUp'
 import FormSignIn from './FormSignIn';
+import { SocialIcon } from 'react-social-icons';
 
 /** Main component for route / */
 export default class App extends Component {
@@ -17,7 +18,6 @@ export default class App extends Component {
 
         this.whoAreWe = React.createRef()
         this.howDoesItWork = React.createRef()
-        this.Copyright= React.createRef()
     }
 
     /** Automatically move the screen to a sub content */
@@ -28,6 +28,8 @@ export default class App extends Component {
                 break;
             case 1:
                 window.scrollTo(0, this.howDoesItWork.current.offsetTop);
+                break;
+            default:
                 break;
         }
 
@@ -50,7 +52,7 @@ export default class App extends Component {
                             <SignUp connexion = {() => this.setState({sign: true})} />
                     }
                 </div>
-                <div style={styles.footer}>
+                <div style={styles.prefooter}>
                     <div ref = {this.whoAreWe}>
                         <HomeInformationItem
                             title = {"Qui sommes-nous ?"}
@@ -69,15 +71,14 @@ export default class App extends Component {
                     </div>
                 </div>
                 
-                <div style={styles.footbis}>
-                    <div ref = {this.Copyright}>
-                        <HomeInformationItem subtitle={"Copyright © 2020 All Rights Reserved by Ekko & Nanterre Hangagée."}/>
-                        <SocialIcon url="http://twitter.com" />
-                        <SocialIcon url="http://facebook.com/pg/NanterreHangagee/about/?ref=page_internal"/>
-                        <SocialIcon url="http://instagram.com" />
-                        <SocialIcon url="http://youtube.com" />
-                        <SocialIcon url="https://www.linkedin.com/company/nanterre-hangag%C3%A9e/?trk=public_profile_volunteering_position_result-card_full-click&originalSubdomain=fr"/>
-                     
+                <div style={styles.footer}>
+                    <h2>Copyright © 2020 All Rights Reserved by Ekko {'&'} Nanterre Hangagée.</h2>
+                    <div style={{display: 'flex', paddingLeft: '40%', paddingRight: '40%', width: '20%'}}>    
+                        <SocialIcon network="twitter" />
+                           
+                        <SocialIcon network="facebook"/>
+                           
+                        <SocialIcon network="youtube" />                     
                      </div>
 
                </div>
@@ -99,16 +100,15 @@ const styles = {
         backgroundRepeat: 'no-repeat',
         zIndex: 1
     },
-    footer: {
+    prefooter: {
         width: '100%',
         height: '100vh',
         
     },
-    footbis: {
-        width: '100%',
-        display:'flex',
-        justifyContent:'center', 
-        alignItems:'center'
+    footer: {
+        width: '50%',
+        margin: 'auto',
+        textAlign: 'center'
     }
 
 

@@ -27,6 +27,7 @@
     "firebase-admin": "^8.8.0",
     "node-ical": "^0.10.0",
     "path": "^0.12.7",
+    "react-social-icons": "^4.1.0",
     "typescript": "^3.7.4"
   }
 }
