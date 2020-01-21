@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 
-// Components for /dashboard url
+// Components for /dashboard url showing the needers-only content
 class Needers extends Component {
 
     constructor(props){

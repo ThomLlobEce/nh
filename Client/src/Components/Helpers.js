@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import axios from 'axios'
 import Needers from './Needers';
 
-// Components for /dashboard url
+// Components for /dashboard url, showing the helpers-only content
 class Helpers extends Component {
 
     constructor(props){

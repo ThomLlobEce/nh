@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, Profiler } from 'react';
 import NavBar from './NavBar'
 import { Redirect } from 'react-router-dom';
 import axios from 'axios'
 import Needers from './Needers';
 import Helpers from './Helpers';
+import User from './User'
 
 // Components for /dashboard url
 class Account extends Component {
@@ -50,19 +51,24 @@ class Account extends Component {
                             this.state.logged ? 
                                 /** User is allowed to access the content of this page */
                                 <div>
-                                    <NavBar logged={true} />
-                                    { /** Common to every users */}
-                                    {
-                                        this.state.need ? 
-                                            // User looking for help
-                                            <Needers 
-                                                user = {this.props.user}
-                                                />
-                                            :
-                                            // User looking for helping
-                                            <Helpers
-                                                />
-                                    }
+                                    <User
+                                        user = {this.props.user}
+                                        />
+                                    <div>
+                                        <NavBar logged={true} />
+                                        { /** Common to every users */}
+                                        {
+                                            this.state.need ? 
+                                                // User looking for help
+                                                <Needers 
+                                                    user = {this.props.user}
+                                                    />
+                                                :
+                                                // User looking for helping
+                                                <Helpers
+                                                    />
+                                        }
+                                    </div>
                                 </div>
                                 : 
                                 /** User is not allowed to access the content of this page */
