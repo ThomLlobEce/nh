@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import NavBar from './NavBar'
 import { Redirect } from 'react-router-dom';
-import axios from 'axios'
 import Needers from './Needers';
 import Helpers from './Helpers';
 import User from './User'
+import { isAuth } from '../Middleware/firebase'
 
 // Components for /dashboard url
-class Account extends Component {
+export default class Account extends Component {
 
     constructor(props){
         super(props)
@@ -24,20 +24,12 @@ class Account extends Component {
 
     // Get wether a client can access or not the content of this restricted for auths only users page
     content = async () => {
-        await axios.get(
-            '/api/isAuth?email='+this.props.user.email
-        )
-        .then( (res) => {
-            if(res.data.status === "success"){
-                // Current user is allowed to access the page
-                this.setState({readyToRender: true, logged: true, need: res.data.message})
-            }
-            else{
-                // Render the redirection to /
-                this.setState({readyToRender: true})
-            }
-        })
-        .catch(error => { this.setState({readyToRender: true}); console.log(error) })
+        if(await isAuth()){
+            this.setState({readyToRender: true, logged: true, need: true})
+        }
+        else{
+            this.setState({readyToRender: true, logged: false})
+        }
     }
 
     render()
@@ -51,22 +43,12 @@ class Account extends Component {
                             this.state.logged ? 
                                 /** User is allowed to access the content of this page */
                                 <div>
-                                    <User
-                                        user = {this.props.user}
-                                        />
+                                    <User user = {this.props.user} />
                                     <div>
-                                        <NavBar logged={true} />
+                                        <NavBar logged={true} disconnect={this.props.disconnect} />
                                         { /** Common to every users */}
                                         {
-                                            this.state.need ? 
-                                                // User looking for help
-                                                <Needers 
-                                                    user = {this.props.user}
-                                                    />
-                                                :
-                                                // User looking for helping
-                                                <Helpers
-                                                    />
+                                            this.state.need ? <Needers user = {this.props.user} /> : <Helpers />
                                         }
                                     </div>
                                 </div>
@@ -75,16 +57,14 @@ class Account extends Component {
                                 <div>
                                     <Redirect to="/" />
                                 </div>
-                                : 
-                                /** Content is not ready to render */
-                                null
+                            : 
+                            /** Content is not ready to render */
+                            null
                         }
                 </div>
             </div>)
     }
 }
-
-export default Account;
 
 const styles = {
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import logo from '../Images/logo.png'
 import MouseOverButton from './MouseOverButton';
+import { disconnect } from '../Middleware/firebase'
 
 const infos = ["Qui sommes-nous ? ", "Comment ça marche ?"]
 
@@ -17,12 +18,10 @@ export default class NavBar extends Component {
                 </Link>
                 {
                     this.props.logged ? 
-                        (
-                            <Link to = {"/"}>
-                                <button onClick={() => {this.props.disconnect()}} style={styles.connexion_button}>Sign out</button>
+                            <Link to = "/">
+                                <button onClick={disconnect()} style={styles.connexion_button}>Sign out</button>
                             </Link>
-                        ) :
-                        (
+                            :
                             <div>
                                 <div style={styles.infos}>
                                     { infos.map( (value, index) => {
@@ -31,7 +30,6 @@ export default class NavBar extends Component {
                                 </div>
                                 <MouseOverButton text={"Connexion"} style={styles.connexion_button} style_over = { styles.connexion_button_over} onClick = { this.props.connexion } />
                             </div>
-                        )
                 }   
             </div>
         )

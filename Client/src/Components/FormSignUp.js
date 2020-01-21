@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 import MouseOverButton from './MouseOverButton'
+import * as firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
+import { createUser } from '../Middleware/firebase'
 
 /** Form used for signing users up */
 export default class FormSignUp extends Component {
@@ -25,7 +29,7 @@ export default class FormSignUp extends Component {
 
     }
 
-    createUser = async () => {
+    createU = async () => {
 
         // Verifying the format of the response given by the user
 
@@ -64,26 +68,11 @@ export default class FormSignUp extends Component {
         if(this.state.error[0] === "" && this.state.error[1] === "" && this.state.error[2] === "" && this.state.error[3] === "" && this.state.error[4] === "" 
             && this.state.error[5] === "" && this.state.error[6] === ""){
                 // The form is correctly formatted
-                // Creating user server-side
-                const response = await axios.post(
-                    '/api/createUser',
-                    {
-                        email: this.state.email,
-                        last_name: this.state.last_name,
-                        first_name: this.state.first_name,
-                        ufr: this.state.ufr,
-                        year: this.state.year,
-                        cm: this.state.cm,
-                        password: this.state.password,
-                        need: this.props.role,
-                    },
-                    { headers: { 'Content-Type': 'application/json' } }
-                )
-                .then( () => {
-                    console.log(response.data)
+                // Creating user
+                let creation = createUser(this.state.email, this.state.password)
+                if(creation){
                     this.props.connexion()
-                })
-                .catch( (error) => console.log(error))
+                }
             
         }else{
             // The form is badly formattred
@@ -97,7 +86,7 @@ export default class FormSignUp extends Component {
         return(
             <div>
                 {
-                    this.state.printFormSignUp ? 
+                    this.props.printFormSignUp ? 
                         // Form must be printed
                         <div style={styles.formulaire}>
                             <button onClick={this.props.toggleSignUp} style={styles.cross}>X</button>
@@ -132,7 +121,7 @@ export default class FormSignUp extends Component {
                             <input type="password" placeholder="Mot de passe" style={styles.textArea} value={this.state.password} onChange = {(event) => {this.setState({password: event.target.value})}}/>
                             {this.state.error[6] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[6]}<br /></div>) : (<br />)}
                             <br/>< br/>
-                            <MouseOverButton text = {"Envoyer"} onClick = {this.createUser} style_over = {styles.submitButton_over} style = {styles.submitButton} />
+                            <MouseOverButton text = {"Envoyer"} onClick = {this.createU} style_over = {styles.submitButton_over} style = {styles.submitButton} />
                         </div>
                         :
                         // Form must not be printed

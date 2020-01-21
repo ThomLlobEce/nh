@@ -45,7 +45,6 @@ export default class App extends Component {
                         this.state.sign ?
                             <FormSignIn 
                                 style={{zIndex: 2}} 
-                                addUser={this.props.addUser}
                                 inscription={() => this.setState({sign: false})}
                             />
                             :

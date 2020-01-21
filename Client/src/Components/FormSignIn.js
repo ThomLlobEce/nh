@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import axios from 'axios'
 import { Redirect } from 'react-router-dom'
 import MouseOverButton from './MouseOverButton';
+import { signIn } from '../Middleware/firebase'
 
 /** Form for signing users in */
 export default class FormSignIn extends Component {
@@ -36,23 +36,13 @@ export default class FormSignIn extends Component {
         if(this.state.error[0] === "" && this.state.error[1] === "" ){
             // Informations provided are well-formated
 
-            // Signing the user in
-            await axios.get(
-                '/api/signIn?email='+this.state.email+'&password='+this.state.password,
-            )
-            .then( (res) => {
-                console.log(res.data.message)
-                if(res.data.message.name){
-                    // User signed in, updating client data and ordering a redirect to dashboard
-                    this.props.addUser(res.data.message)
-                    this.setState({redirect: true})
-                }
-                else{
-                    // User could not have been signed in
-                    this.state.error[0] = "Sorry, we can't logged you in with provided informations"
-                    this.forceUpdate()
-                }
-            })
+            if(await signIn(this.state.email, this.state.password)){
+                this.setState({redirect: true})
+            }
+            else{
+                this.state.error[0] = "Sorry, we can't logged you in with provided informations"
+                this.forceUpdate()  
+            }
         }
         else{
             // Informations provided are bad-formated

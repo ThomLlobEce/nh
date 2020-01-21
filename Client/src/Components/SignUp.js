@@ -24,8 +24,8 @@ export default class SignUp extends Component {
                 <MouseOverButton text={"Je veux aider"} style={styles.become} style_over={styles.become_over} onClick={() => this.setState({printBecome: true})} />
 
                 { /** Forms, shown above the buttons if users has pressed one  */}
-                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.state.printNeed} role = {true} toggleSignUp = {() => this.setState({printNeed: !this.state.printNeed})} connexion = {() => this.connexion()}/>
-                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.state.printBecome} role = {false} toggleSignUp = {() => this.setState({printBecome: !this.state.printBecome})} connexion = {() => this.props.connexion()}/>
+                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.state.printNeed} role = {true} toggleSignUp = {() => this.setState({printNeed: !this.state.printNeed})} connexion = {() => this.connexion()} createUser={this.props.createUser}/>
+                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.state.printBecome} role = {false} toggleSignUp = {() => this.setState({printBecome: !this.state.printBecome})} connexion = {() => this.props.connexion()}  createUser={this.props.createUser}/>
             </div>
         )
     }
