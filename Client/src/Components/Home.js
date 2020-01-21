@@ -5,31 +5,21 @@ import Rima from '../Images/Rima.png'
 import SignUp from './SignUp'
 import FormSignIn from './FormSignIn';
 
-class App extends Component {
+/** Main component for route / */
+export default class App extends Component {
 
     constructor(props){
         super(props)
 
         this.state = {
-            printNeed: false,
-            printBecome: false,
-            overNeed: false,
-            overBecome: false,
-            sign: false // false = forms for sign up, true = form for sign in
+            sign: false // false = show screen to sign up, true = show screen to sign in
         }
 
         this.whoAreWe = React.createRef()
         this.howDoesItWork = React.createRef()
     }
 
-    toggleNeed = () => {
-        this.setState({printNeed: !this.state.printNeed})
-    }
-
-    toggleBecome = () => {
-        this.setState({printBecome: !this.state.printBecome})
-    }
-
+    /** Automatically move the screen to a sub content */
     moveTo = (i) => {
         switch(i){
             case 0:
@@ -50,25 +40,13 @@ class App extends Component {
                 <div style={styles.forms} >
                     {
                         this.state.sign ?
-                        <FormSignIn 
-                            style={{zIndex: 2}} 
-                            addUser={this.props.addUser}
-                            inscription={() => this.setState({sign: false})}
-                        />
-                        :
-                        <SignUp
-                            mouseOutNeed={() => this.setState({overNeed: false})}
-                            mouseOverNeed={() => this.setState({overNeed: true})}
-                            overNeed = {this.state.overNeed}
-                            toggleNeed = {this.toggleNeed}
-                            printNeed = {this.state.printNeed}
-                            mouseOutBecome={() => this.setState({overBecome: false})}
-                            mouseOverBecome={() => this.setState({overBecome: true})}
-                            overBecome = {this.state.overBecome}
-                            toggleBecome = {this.toggleBecome}
-                            printBecome = {this.state.printBecome}
-                            connexion = {() => this.setState({sign: true, printBecome: false, printNeed: false})}
-                        />
+                            <FormSignIn 
+                                style={{zIndex: 2}} 
+                                addUser={this.props.addUser}
+                                inscription={() => this.setState({sign: false})}
+                            />
+                            :
+                            <SignUp connexion = {() => this.setState({sign: true})} />
                     }
                 </div>
                 <div style={styles.footer}>
@@ -93,8 +71,6 @@ class App extends Component {
         );
     }
 }
-
-export default App;
 
 const styles = {
     forms: {

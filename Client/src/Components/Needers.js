@@ -7,7 +7,7 @@ class Needers extends Component {
     constructor(props){
         super(props)
 
-        this.getIcalData()
+        this.getIcalData() // Getting upcomming event from server
     }
 
     state = {

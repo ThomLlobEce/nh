@@ -10,7 +10,7 @@ class Helpers extends Component {
     constructor(props){
         super(props)
 
-        this.getUpcommingEventsLookingForHelpers()
+        this.getUpcommingEventsLookingForHelpers() // Getting upcomming events from server
     }
 
     state = {

@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 import { Redirect, Link} from 'react-router-dom'
+import MouseOverButton from './MouseOverButton';
 
+/** Form for signing users in */
 export default class FormSignIn extends Component {
 
     constructor(props){
         super(props)
 
         this.state = {
-            email: "",
-            password: "",
-            error: ["", ""],
-            redirect: false
+            email: "", // Form variable
+            password: "", // Form variable
+            error: ["", ""], // Store the errors to show beneath the text input of the form
+            redirect: false // Wether the user should be redirect to its dashboard or not
         }
 
     }
@@ -20,7 +22,7 @@ export default class FormSignIn extends Component {
     signIn = async () => {
 
         // Verifying fields
-        this.state.error = ["", ""]
+        this.state.error = ["", ""] // Reseting errors to show
 
         if(this.state.email === ""){
             this.state.error[0] = "This fields is empty."
@@ -33,23 +35,27 @@ export default class FormSignIn extends Component {
 
         if(this.state.error[0] === "" && this.state.error[1] === "" ){
             // Informations provided are well-formated
-            // Using signIn API
+
+            // Signing the user in
             await axios.get(
                 '/api/signIn?email='+this.state.email+'&password='+this.state.password,
             )
             .then( (res) => {
                 console.log(res.data.message)
                 if(res.data.message.name){
-                    // User signed in, updating client data and ordering a redirect
+                    // User signed in, updating client data and ordering a redirect to dashboard
                     this.props.addUser(res.data.message)
                     this.setState({redirect: true})
                 }
                 else{
+                    // User could not have been signed in
                     this.state.error[0] = "Sorry, we can't logged you in with provided informations"
                     this.forceUpdate()
                 }
             })
-        }else{
+        }
+        else{
+            // Informations provided are bad-formated
             console.log("Unable to sign up. Data is not correctly formatted.")
         }
 
@@ -59,8 +65,9 @@ export default class FormSignIn extends Component {
     {
         return(
             <div>
-                { // if a redirect is required, not rendering this component. 
-                this.state.redirect ? <Redirect to='/dashboard'/> : null
+                { 
+                    // if a redirect is required, not rendering this component. 
+                    this.state.redirect ? <Redirect to='/dashboard'/> : null
                 }
                 <div style={styles.formulaire}>
                     <label style={styles.legend}>
@@ -93,50 +100,10 @@ export default class FormSignIn extends Component {
                     }
                     <br/>
                     <br/>
-                    <div 
-                        onMouseOut={() => this.setState({sendOver: false})} 
-                        onMouseOver={() => this.setState({sendOver: true})}>
-                            {
-                                this.state.sendOver ? 
-                                    <button 
-                                        onClick={this.signIn} 
-                                        style={styles.submitButton_over}
-                                    >
-                                        Envoyer
-                                    </button>
-                                    :
-                                    <button 
-                                        onClick={this.signIn} 
-                                        style={styles.submitButton}
-                                    >
-                                        Envoyer
-                                    </button>
-                            }
-                    </div>
+                    <MouseOverButton text = {"Envoyer"} style_over = { styles.submitButton_over } style = { styles.submitButton } onClick = { () => this.signIn() }/>
                     
                     <div style={{textAlign: "center", verticalAlign: "middle"}}>
-                        Pas encore de compte ? 
-                        <div 
-                            onMouseOut={() => this.setState({inscriptionOver: false})} 
-                            onMouseOver={() => this.setState({inscriptionOver: true})}
-                            >
-                                {
-                                    this.state.inscriptionOver ? 
-                                        <div
-                                            style={{color: "#57a5ff", textDecoration: "underline"}} 
-                                            onClick={this.props.inscription}
-                                            >
-                                                Creer-en un tout de suite !
-                                        </div>
-                                        :
-                                        <div
-                                            style={{color: "blue"}} 
-                                            onClick={this.props.inscription}
-                                            >
-                                                Creer-en un tout de suite !
-                                        </div>
-                                }   
-                        </div>
+                        Pas encore de compte ?  <MouseOverButton text = {"Creer-en un tout de suite !"} style_over = {{color: "#57a5ff", textDecoration: "underline"}} style={{color: "blue"}} onClick = { this.props.inscription }/>
                     </div>
                 </div>
             </div>
@@ -199,9 +166,7 @@ const styles = {
     },
 
     submitButton: {
-        position: 'relative',
-	    display: 'block',
-	    padding: '19px 39px 18px 39px',
+	    display: 'flex',
         color: '#FFF',
         margin: 'auto',
         background: '#EC670A',
@@ -209,15 +174,16 @@ const styles = {
         textAlign: 'center',
         fontStyle: 'normal',
         width: '100%',
+        height: 40,
         border: '1px solid #EC670A',
         borderWidth: '1px 1px 3px',
-        marginBottom: 10
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
 
     submitButton_over: {
-        position: 'relative',
-	    display: 'block',
-	    padding: '19px 39px 18px 39px',
+	    display: 'flex',
         color: '#FFF',
         margin: 'auto',
         background: '#EC8E0A',
@@ -225,17 +191,11 @@ const styles = {
         textAlign: 'center',
         fontStyle: 'normal',
         width: '100%',
+        height: 40,
         border: '1px solid #EC8E0A',
         borderWidth: '1px 1px 3px',
-        marginBottom: 10
-    },
-
-    cross: {
-        position: 'absolute',
-        top: 5,
-        right: 5,
-        border: "none",
-        backgroundColor: '#f4f7f8',
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center'
     }
-
-    }
+}

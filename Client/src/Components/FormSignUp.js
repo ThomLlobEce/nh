@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-import {withRouter, Redirect} from 'react-router-dom'
+import MouseOverButton from './MouseOverButton'
 
-export default withRouter(class FormSignUp extends Component {
+/** Form used for signing users up */
+export default class FormSignUp extends Component {
 
     constructor(props){
         super(props)
 
         this.state = {
+            /** Form variables */
             last_name: "",
             first_name: "",
             ufr: "",
@@ -16,6 +18,8 @@ export default withRouter(class FormSignUp extends Component {
             email: "",
             password: "",
             role: this.props.role,
+
+            /** Error to show to the user when he badly formatted somethings */
             error: ["", "", "", "", "", "", ""]
         }
 
@@ -23,7 +27,9 @@ export default withRouter(class FormSignUp extends Component {
 
     createUser = async () => {
 
-        this.state.error = ["", "", "", "", "", "", ""]
+        // Verifying the format of the response given by the user
+
+        this.state.error = ["", "", "", "", "", "", ""] // Reseting errors to show
 
         if(this.state.last_name === ""){
             this.state.error[0] = "Ce champ est vide."
@@ -57,91 +63,85 @@ export default withRouter(class FormSignUp extends Component {
 
         if(this.state.error[0] === "" && this.state.error[1] === "" && this.state.error[2] === "" && this.state.error[3] === "" && this.state.error[4] === "" 
             && this.state.error[5] === "" && this.state.error[6] === ""){
-            const response = await axios.post(
-                '/api/createUser',
-                {
-                    email: this.state.email,
-                    last_name: this.state.last_name,
-                    first_name: this.state.first_name,
-                    ufr: this.state.ufr,
-                    year: this.state.year,
-                    cm: this.state.cm,
-                    password: this.state.password,
-                    need: this.props.role,
-                },
-                { headers: { 'Content-Type': 'application/json' } }
-            )
-            console.log(response.data)
-            this.props.connexion()
+                // The form is correctly formatted
+                // Creating user server-side
+                const response = await axios.post(
+                    '/api/createUser',
+                    {
+                        email: this.state.email,
+                        last_name: this.state.last_name,
+                        first_name: this.state.first_name,
+                        ufr: this.state.ufr,
+                        year: this.state.year,
+                        cm: this.state.cm,
+                        password: this.state.password,
+                        need: this.props.role,
+                    },
+                    { headers: { 'Content-Type': 'application/json' } }
+                )
+                .then( () => {
+                    console.log(response.data)
+                    this.props.connexion()
+                })
+                .catch( (error) => console.log(error))
+            
         }else{
+            // The form is badly formattred
             console.log("Unable to sign up. Data is not correctly formatted.")
         }
 
     }
 
-    printFormSignUp = () => {
-        if (this.props.printFormSignUp === true)
-        {
-            return(
-            <div>
-                <div style={styles.formulaire}>
-                    <button onClick={this.props.toggleSignUp} style={styles.cross}>X</button>
-                    <label style={styles.legend}><span style={styles.number}>1</span> Identité</label>
-                    <br/>
-                    <br/>
-                    <input type="text" placeholder="Nom" style={styles.textArea} value={this.state.last_name} onChange = {(event) => {this.setState({last_name: event.target.value})}}/>
-                    {this.state.error[0] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[0]}<br /></div>) : (<br />)}
-                    <br/>
-                    <input type="text" placeholder="Prénom" style={styles.textArea} value={this.state.first_name} onChange = {(event) => {this.setState({first_name: event.target.value})}}/>
-                    {this.state.error[1] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[1]}<br /></div>) : (<br />)}
-                    <br/>
-                    <input type="text" placeholder="Email" style={styles.textArea} value={this.state.email} onChange = {(event) => {this.setState({email: event.target.value})}}/>
-                    {this.state.error[2] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[2]}<br /></div>) : (<br />)}
-                    <br/>
-                    <label style={styles.legend}><span style={styles.number}>2</span> Informations Etudiantes</label>
-                    <br/>
-                    <br/>
-                    <input type="text" placeholder="UFR" style={styles.textArea} value={this.state.ufr} onChange = {(event) => {this.setState({ufr: event.target.value})}}/>
-                    {this.state.error[3] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[3]}<br /></div>) : (<br />)}
-                    <br/>
-                    <input type="text" placeholder="Année" style={styles.textArea} value={this.state.year} onChange = {(event) => {this.setState({year: event.target.value})}}/>
-                    {this.state.error[4] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[4]}<br /></div>) : (<br />)}
-                    <br/>
-                    <input type="text" placeholder="CM" style={styles.textArea} value={this.state.cm} onChange = {(event) => {this.setState({cm: event.target.value})}}/>
-                    {this.state.error[5] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[5]}<br /></div>) : (<br />)}
-                    <br/>
-                    <br/>
-                    <label style={styles.legend}><span style={styles.number}>3</span> Mot de passe</label>
-                    <br/>
-                    <br/>
-                    <input type="password" placeholder="Mot de passe" style={styles.textArea} value={this.state.password} onChange = {(event) => {this.setState({password: event.target.value})}}/>
-                    {this.state.error[6] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[6]}<br /></div>) : (<br />)}
-                    <br/>< br/>
-                    <div
-                        onMouseOut={() => this.setState({submitOver: false})} 
-                        onMouseOver={() => this.setState({submitOver: true})}
-                        >
-                            {
-                                this.state.submitOver ?
-                                    <button onClick={this.createUser} style={styles.submitButton_over}>Envoyer</button>
-                                    :
-                                    <button onClick={this.createUser} style={styles.submitButton}>Envoyer</button>
-                            }
-                    </div>
-                </div>
-            </div>)
-      }else{
-          return(<div></div>)
-      }
-    }
-
     render()
     {
         return(
-            <this.printFormSignUp/>
+            <div>
+                {
+                    this.state.printFormSignUp ? 
+                        // Form must be printed
+                        <div style={styles.formulaire}>
+                            <button onClick={this.props.toggleSignUp} style={styles.cross}>X</button>
+                            <label style={styles.legend}><span style={styles.number}>1</span> Identité</label>
+                            <br/>
+                            <br/>
+                            <input type="text" placeholder="Nom" style={styles.textArea} value={this.state.last_name} onChange = {(event) => {this.setState({last_name: event.target.value})}}/>
+                            {this.state.error[0] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[0]}<br /></div>) : (<br />)}
+                            <br/>
+                            <input type="text" placeholder="Prénom" style={styles.textArea} value={this.state.first_name} onChange = {(event) => {this.setState({first_name: event.target.value})}}/>
+                            {this.state.error[1] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[1]}<br /></div>) : (<br />)}
+                            <br/>
+                            <input type="text" placeholder="Email" style={styles.textArea} value={this.state.email} onChange = {(event) => {this.setState({email: event.target.value})}}/>
+                            {this.state.error[2] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[2]}<br /></div>) : (<br />)}
+                            <br/>
+                            <label style={styles.legend}><span style={styles.number}>2</span> Informations Etudiantes</label>
+                            <br/>
+                            <br/>
+                            <input type="text" placeholder="UFR" style={styles.textArea} value={this.state.ufr} onChange = {(event) => {this.setState({ufr: event.target.value})}}/>
+                            {this.state.error[3] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[3]}<br /></div>) : (<br />)}
+                            <br/>
+                            <input type="text" placeholder="Année" style={styles.textArea} value={this.state.year} onChange = {(event) => {this.setState({year: event.target.value})}}/>
+                            {this.state.error[4] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[4]}<br /></div>) : (<br />)}
+                            <br/>
+                            <input type="text" placeholder="CM" style={styles.textArea} value={this.state.cm} onChange = {(event) => {this.setState({cm: event.target.value})}}/>
+                            {this.state.error[5] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[5]}<br /></div>) : (<br />)}
+                            <br/>
+                            <br/>
+                            <label style={styles.legend}><span style={styles.number}>3</span> Mot de passe</label>
+                            <br/>
+                            <br/>
+                            <input type="password" placeholder="Mot de passe" style={styles.textArea} value={this.state.password} onChange = {(event) => {this.setState({password: event.target.value})}}/>
+                            {this.state.error[6] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[6]}<br /></div>) : (<br />)}
+                            <br/>< br/>
+                            <MouseOverButton text = {"Envoyer"} onClick = {this.createUser} style_over = {styles.submitButton_over} style = {styles.submitButton} />
+                        </div>
+                        :
+                        // Form must not be printed
+                        null
+                }
+            </div>
         );
     }
-})
+}
 
 const styles = {
 

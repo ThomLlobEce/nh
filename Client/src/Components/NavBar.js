@@ -1,34 +1,12 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import logo from '../Images/logo.png'
+import MouseOverButton from './MouseOverButton';
 
 const infos = ["Qui sommes-nous ? ", "Comment ça marche ?"]
 
+/** Navigation bar for every routes */
 export default class NavBar extends Component {
-
-    constructor(props){
-        super(props)
-
-        this.state = {connexion_over: false, infos: [false, false]}
-    }
-
-    mouseOutConnexion() {
-        this.setState({connexion_over: false});
-    }
-      
-    mouseOverConnexion() {
-        this.setState({connexion_over: true});
-    }
-
-    mouseOutInfos(i) {
-        this.state.infos[i] = false
-        this.forceUpdate()
-    }
-      
-    mouseOverInfos(i) {
-        this.state.infos[i] = true
-        this.forceUpdate()
-    }
 
     render()
     {
@@ -39,39 +17,21 @@ export default class NavBar extends Component {
                 </Link>
                 {
                     this.props.logged ? 
-                    (
-                        <Link to = {"/"}>
-                            <button onClick={() => {this.props.disconnect()}} style={styles.connexion_button}>Sign out</button>
-                        </Link>
-                    ) :
-                    (
-                        <div>
-                            <div style={styles.infos}>
-                                {
-                                    infos.map( (value, index) => {
-                                        return (
-                                            <div onClick = {() => {this.props.moveTo(index)}} onMouseOut={() => this.mouseOutInfos(index)} onMouseOver={() => this.mouseOverInfos(index)} >
-                                                {this.state.infos[index] ? 
-                                                    <div style={styles.infos_item_over}>{value}</div> 
-                                                    :
-                                                    <div style={styles.infos_item}>{value}</div>
-                                                }
-                                            </div>
-                                        )
-                                    })
-                                }
+                        (
+                            <Link to = {"/"}>
+                                <button onClick={() => {this.props.disconnect()}} style={styles.connexion_button}>Sign out</button>
+                            </Link>
+                        ) :
+                        (
+                            <div>
+                                <div style={styles.infos}>
+                                    { infos.map( (value, index) => {
+                                        return <MouseOverButton text={value} style = {styles.infos_item} style_over={styles.infos_item_over} onClick={() => {this.props.moveTo(index)}}/>
+                                    })}
+                                </div>
+                                <MouseOverButton text={"Connexion"} style={styles.connexion_button} style_over = { styles.connexion_button_over} onClick = { this.props.connexion } />
                             </div>
-                            <div onMouseOut={() => this.mouseOutConnexion()} onMouseOver={() => this.mouseOverConnexion()}>
-                                
-                                    { 
-                                        this.state.connexion_over ? 
-                                            <button onClick={this.props.connexion} style={styles.connexion_button_over}>Connexion</button>
-                                            :
-                                            <button onClick={this.props.connexion} style={styles.connexion_button}>Connexion</button>
-                                    }
-                            </div>
-                        </div>
-                    )
+                        )
                 }   
             </div>
         )

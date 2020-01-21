@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 
+/** Component for the pre-footer informations for the route / */
 class HomeInformationItem extends Component {
 
     render()

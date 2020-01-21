@@ -1,62 +1,35 @@
 import React, { Component } from 'react';
 import FormSignUp from './FormSignUp'
+import MouseOverButton from './MouseOverButton'
 
+/** Component managing the sign up forms (for needers & helpers) */
+export default class SignUp extends Component {
 
-class SignUp extends Component {
+    state = {
+        printNeed: false, // true if the form for needers should be printed
+        printBecome: false // true if the form for helpers should be printed
+    }
+
+    connexion = () => {
+        this.setState({printBecome: false, printNeed: false})
+        this.props.connexion()
+    }
 
     render()
     {
         return(
             <div>
-                <div
-                    onMouseOut={this.props.mouseOutNeed} 
-                    onMouseOver={this.props.mouseOverNeed}
-                    >
-                    {
-                        this.props.overNeed ?
-                        <button
-                            style={styles.need_over}
-                            onClick={this.props.toggleNeed}
-                            >J'ai besoin d'aide
-                        </button>
-                        :
-                        <button
-                            style={styles.need}
-                            onClick={this.props.toggleNeed}
-                            >J'ai besoin d'aide
-                        </button>
-                    }            
-                </div>
-                
-                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.props.printNeed} role = {true} toggleSignUp = {this.props.toggleNeed} connexion = {this.props.connexion}/>
-                
-                <div
-                    onMouseOut={this.props.mouseOutBecome} 
-                    onMouseOver={this.props.mouseOverBecome}
-                    >
-                    {
-                        this.props.overBecome ? 
-                            <button
-                                style={styles.become_over}
-                                onClick={this.props.toggleBecome}
-                                >Je veux aider
-                            </button>
-                            :
-                            <button
-                                style={styles.become}
-                                onClick={this.props.toggleBecome}
-                                >Je veux aider
-                            </button>
-                    }
-                </div>
-                
-                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.props.printBecome} role = {false} toggleSignUp = {this.props.toggleBecome} connexion = {this.props.connexion}/>
+                {/** Buttons to toggle forms */}
+                <MouseOverButton text={"J'ai besoin d'aide"} style={styles.need} style_over={styles.need_over} onClick={() => this.setState({printNeed: true})} />
+                <MouseOverButton text={"Je veux aider"} style={styles.become} style_over={styles.become_over} onClick={() => this.setState({printBecome: true})} />
+
+                { /** Forms, shown above the buttons if users has pressed one  */}
+                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.state.printNeed} role = {true} toggleSignUp = {() => this.setState({printNeed: !this.state.printNeed})} connexion = {() => this.connexion()}/>
+                <FormSignUp style={{zIndex: 2}} printFormSignUp = {this.state.printBecome} role = {false} toggleSignUp = {() => this.setState({printBecome: !this.state.printBecome})} connexion = {() => this.props.connexion()}/>
             </div>
         )
     }
 }
-
-export default SignUp;
 
 const styles = {
     need: {
