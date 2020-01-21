@@ -5,6 +5,9 @@ import Rima from '../Images/Rima.png'
 import SignUp from './SignUp'
 import FormSignIn from './FormSignIn';
 
+import { SocialIcon } from 'react-social-icons';
+
+
 class App extends Component {
 
     constructor(props){
@@ -20,6 +23,7 @@ class App extends Component {
 
         this.whoAreWe = React.createRef()
         this.howDoesItWork = React.createRef()
+        this.Copyright= React.createRef()
     }
 
     toggleNeed = () => {
@@ -76,7 +80,7 @@ class App extends Component {
                         <HomeInformationItem
                             title = {"Qui sommes-nous ?"}
                             subtitle = {"Nanterre hangagée ! Une association de l'université de Nanterre ayant pour but de sensibiliser la communauté universitaire à la question du handicap."}
-                            p = {"Notamment, nous mettons en place des actions d'accompagnement et de formations ... comme celle-ci !\nVoici quelques visages de l'association :  "}
+                            p = {"Nanterre Hangagée est un programme qui a pour but de rapprocher un preneur de notes et un élève en situation de handicap. Pour les preneurs de notes, vos efforts ont vocation à être rémunérés. Si vous souhaitez participer à ce programme, ne vous inquiétez pas, la relation preneur de notes étudiants n'est pas automatique. Ainsi, dans cette optique vous ne serez pas engagés dès le premier cours.\nVoici quelques visages de l'association :  "}
                             srcImage = {Rima}
                             name = {"Rima Chihi"}
                             status = {"Présidente"}
@@ -89,6 +93,21 @@ class App extends Component {
                         />
                     </div>
                 </div>
+                
+                <div style={styles.footbis}>
+                    <div ref = {this.Copyright}>
+                        <HomeInformationItem subtitle={"Copyright © 2020 All Rights Reserved by Ekko & Nanterre Hangagée."}/>
+                        <SocialIcon url="http://twitter.com" />
+                        <SocialIcon url="http://facebook.com/pg/NanterreHangagee/about/?ref=page_internal"/>
+                        <SocialIcon url="http://instagram.com" />
+                        <SocialIcon url="http://youtube.com" />
+                        <SocialIcon url="https://www.linkedin.com/company/nanterre-hangag%C3%A9e/?trk=public_profile_volunteering_position_result-card_full-click&originalSubdomain=fr"/>
+                     
+                     </div>
+
+               </div>
+
+
             </div>
         );
     }
@@ -109,6 +128,15 @@ const styles = {
     },
     footer: {
         width: '100%',
-        height: '100vh'
+        height: '100vh',
+        
+    },
+    footbis: {
+        width: '100%',
+        display:'flex',
+        justifyContent:'center', 
+        alignItems:'center'
     }
+
+
 }
