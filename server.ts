@@ -218,7 +218,7 @@ app.post('/api/addIcalToUser', function(req, res) {
 
 app.get('/api/getIcalData', async function(req, res) {
     console.log("*** API REQUEST (GET) : /api/getIcalData ***")
-    console.log("Parameters given : " + req.body)
+    console.log("Parameters given : " + JSON.stringify(req.body))
 
     
     var exist:boolean = false
@@ -286,7 +286,7 @@ app.get('/api/getIcalData', async function(req, res) {
 
 app.post('/api/addHelpRequest', function(req: { body: { requester: User, event: Event; }; }, res: { json: (arg0: { status: string; message: string; }) => void; }) {
     
-    console.log("*** API REQUEST (GET) : /api/addIcalToUser ***")
+    console.log("*** API REQUEST (GET) : /api/addHelpRequest ***")
     console.log("Parameters given : " + JSON.stringify(req.body))
 
     var exist = false
@@ -302,7 +302,14 @@ app.post('/api/addHelpRequest', function(req: { body: { requester: User, event: 
             if (users[i].email === req.body.requester.email) {
                 exist = true;
                 // Adding the user and the event to DB
+                let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
                 eventRequiringHelpers.push({requester: req.body.requester, event: req.body.event})
+                eventRequiringHelpers.sort( function(a, b){
+                        let first = new Date(months[parseInt(a.event.startMonth)] + '-' + a.event.startDay + ', ' + a.event.startYear + ' ' + a.event.startHours + ':' + a.event.startMinutes + ':00')
+                        let second = new Date(months[parseInt(b.event.startMonth)] + '-' + b.event.startDay + ', ' + b.event.startYear + ' ' + b.event.startHours + ':' + b.event.startMinutes + ':00')
+                
+                        return first > second ? 1 : first < second ? -1 : 0
+                })
                 console.log("Event and requester correctly added to DB : " + JSON.stringify({requester: req.body.requester, event: req.body.event}))                
             }
         }
@@ -332,6 +339,8 @@ app.post('/api/addHelpRequest', function(req: { body: { requester: User, event: 
 
 app.get('/api/getUpcommingEvents', async function(req, res) {
     console.log("*** API REQUEST (GET) : /api/getUpcommingEvents ***")
+
+
 
     res.json({
         status: "success",

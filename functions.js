@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var ical = require('node-ical');
 var event_1 = require("./event");
+/** Load a list of event from an ICAL url */
 function parseICALdata(user) {
     return __awaiter(this, void 0, void 0, function () {
         var events, i;
@@ -63,7 +64,8 @@ function parseICALdata(user) {
                                 }
                             });
                         }).then(function (eventsTab) {
-                            return eventsTab;
+                            var eventsToReturn = onlyUpcommingEvents(eventsTab);
+                            return eventsToReturn;
                         })];
                 case 1:
                     events = _a.sent();
@@ -73,3 +75,21 @@ function parseICALdata(user) {
     });
 }
 exports.parseICALdata = parseICALdata;
+/** Prevent from showing events that already happened & sort the remaining items*/
+function onlyUpcommingEvents(ev) {
+    var date;
+    var eventsToReturn = [];
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    ev.forEach(function (value) {
+        date = months[parseInt(value.endMonth)] + '-' + value.endDay + ', ' + value.endYear + ' ' + value.endHours + ':' + value.endMinutes + ':00';
+        if (Date.parse(date) > Date.now()) {
+            eventsToReturn.push(value);
+        }
+    });
+    eventsToReturn.sort(function (a, b) {
+        var first = new Date(months[parseInt(a.startMonth)] + '-' + a.startDay + ', ' + a.startYear + ' ' + a.startHours + ':' + a.startMinutes + ':00');
+        var second = new Date(months[parseInt(b.startMonth)] + '-' + b.startDay + ', ' + b.startYear + ' ' + b.startHours + ':' + b.startMinutes + ':00');
+        return first > second ? 1 : first < second ? -1 : 0;
+    });
+    return eventsToReturn;
+}

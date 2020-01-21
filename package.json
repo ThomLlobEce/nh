@@ -1,5 +1,5 @@
 {
-  "name": "nhclient",
+  "name": "nh",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "start": "node server.js",
     "tsc": "tsc",
     "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix Client && npm run build --prefix Client",
-    "build": "npm run build --prefix Client && npm run tsc server.ts",
+    "build": "npm run build --prefix Client && npm run tsc server.ts"
   },
   "repository": {
     "type": "git",

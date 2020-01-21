@@ -1,19 +1,19 @@
 export default class Event {
-    title: String
-    location: String
-    startMinutes: String
-    startHours: String
-    startDay: String
-    startMonth: String
-    startYear: String
-    endMinutes: String
-    endHours: String
-    endDay: String
-    endMonth: String
-    endYear: String
+    title: string
+    location: string
+    startMinutes: string
+    startHours: string
+    startDay: string
+    startMonth: string
+    startYear: string
+    endMinutes: string
+    endHours: string
+    endDay: string
+    endMonth: string
+    endYear: string
 
-    constructor(title: String, location: String, startMinutes: String, startHours: String, startDay: String, startMonth: String, startYear: String, 
-                                                    endMinutes: String, endHours: String, endDay: String, endMonth: String, endYear: String){
+    constructor(title: string, location: string, startMinutes: string, startHours: string, startDay: string, startMonth: string, startYear: string, 
+                                                    endMinutes: string, endHours: string, endDay: string, endMonth: string, endYear: string){
         this.title=title
         this.location=location
         this.startMinutes = startMinutes

@@ -233,7 +233,7 @@ app.get('/api/getIcalData', function (req, res) {
             switch (_a.label) {
                 case 0:
                     console.log("*** API REQUEST (GET) : /api/getIcalData ***");
-                    console.log("Parameters given : " + req.body);
+                    console.log("Parameters given : " + JSON.stringify(req.body));
                     exist = false;
                     missingParams = false;
                     logged = false;
@@ -300,7 +300,7 @@ app.get('/api/getIcalData', function (req, res) {
     });
 });
 app.post('/api/addHelpRequest', function (req, res) {
-    console.log("*** API REQUEST (GET) : /api/addIcalToUser ***");
+    console.log("*** API REQUEST (GET) : /api/addHelpRequest ***");
     console.log("Parameters given : " + JSON.stringify(req.body));
     var exist = false;
     var missingParams = false;
@@ -309,14 +309,23 @@ app.post('/api/addHelpRequest', function (req, res) {
         missingParams = true;
     }
     else {
-        // Verifying that the helper exists
-        for (var i = 0; i < users.length; i++) {
+        var _loop_1 = function () {
             if (users[i].email === req.body.requester.email) {
                 exist = true;
                 // Adding the user and the event to DB
+                var months_1 = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
                 eventRequiringHelpers.push({ requester: req.body.requester, event: req.body.event });
+                eventRequiringHelpers.sort(function (a, b) {
+                    var first = new Date(months_1[parseInt(a.event.startMonth)] + '-' + a.event.startDay + ', ' + a.event.startYear + ' ' + a.event.startHours + ':' + a.event.startMinutes + ':00');
+                    var second = new Date(months_1[parseInt(b.event.startMonth)] + '-' + b.event.startDay + ', ' + b.event.startYear + ' ' + b.event.startHours + ':' + b.event.startMinutes + ':00');
+                    return first > second ? 1 : first < second ? -1 : 0;
+                });
                 console.log("Event and requester correctly added to DB : " + JSON.stringify({ requester: req.body.requester, event: req.body.event }));
             }
+        };
+        // Verifying that the helper exists
+        for (var i = 0; i < users.length; i++) {
+            _loop_1();
         }
     }
     if (!exist) {

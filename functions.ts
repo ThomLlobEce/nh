@@ -3,6 +3,7 @@ const ical = require('node-ical');
 import Event from './event'
 import User from './user'
 
+/** Load a list of event from an ICAL url */
 export async function parseICALdata(user: User){
     let events:Event[] = []
     let i = 0
@@ -28,9 +29,35 @@ export async function parseICALdata(user: User){
             
         }).then( (eventsTab:Event[]):Event[] => {
             
-            return eventsTab
+            let eventsToReturn:Event[] = onlyUpcommingEvents(eventsTab)
+
+            return eventsToReturn
         }
     )
 
     return events
+}
+
+/** Prevent from showing events that already happened & sort the remaining items*/
+function onlyUpcommingEvents(ev: Event[]) {
+    let date:string
+    let eventsToReturn:Event[] = []
+    let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    ev.forEach( (value) => {
+        date = months[parseInt(value.endMonth)] + '-' + value.endDay + ', ' + value.endYear + ' ' + value.endHours + ':' + value.endMinutes + ':00'
+        
+        if(Date.parse(date) > Date.now()){
+            eventsToReturn.push(value)
+        }
+        
+    })
+
+    eventsToReturn.sort(function(a, b) {
+        let first = new Date(months[parseInt(a.startMonth)] + '-' + a.startDay + ', ' + a.startYear + ' ' + a.startHours + ':' + a.startMinutes + ':00')
+        let second = new Date(months[parseInt(b.startMonth)] + '-' + b.startDay + ', ' + b.startYear + ' ' + b.startHours + ':' + b.startMinutes + ':00')
+
+        return first > second ? 1 : first < second ? -1 : 0
+    })
+
+    return eventsToReturn
 }

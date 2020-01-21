@@ -2,204 +2,77 @@ import React, { Component } from 'react';
 import NavBar from './NavBar'
 import { Redirect } from 'react-router-dom';
 import axios from 'axios'
+import Needers from './Needers';
+import Helpers from './Helpers';
 
-// Dashboard view
+// Components for /dashboard url
 class Account extends Component {
 
-    
     constructor(props){
         super(props)
 
-        this.content()
+        this.content() // Verify that a user is logged before showing logged-only content
     }
 
     state = {
         readyToRender: false, // false while fetching API data, true when ready to render
         logged: false, // Wether there is a logged user
-        ical: '', // contains the ical value of the ical form
-        timetable: [],
-        showContextualMenu: false,
-        eventForContextualMenu: null,
-        need: null,
-        upcommingEventsLookingForHelper: []
+        need: null, // true means the user is looking for help, false means the user is looking for helping (to show the correct content)
+
     }
 
-    requestHelp = async () => {
-        await axios.post(
-            '/api/addHelpRequest',
-            {
-                requester: this.props.user,
-                event: this.state.eventForContextualMenu
-            },
-            { headers: { 'Content-Type': 'application/json' } }
-        )
-        .then( (res) => {
-            if(res.data.status === 'success'){
-                console.log("Request has correctly been submited")
-                this.setState({showContextualMenu: false, eventForContextualMenu: null})
-            }
-            else{
-                console.log("Error while getting ical data " + res.data.message)
-            }
-        })
-        .catch(error => { console.log(error)})
-    }
-
-    getUpcommingEvents = async () => {
-        await axios.get(
-            '/api/getUpcommingEvents'
-        )
-        .then( (res) => {
-            if(res.data.status === 'success'){
-                console.log("Upcomming events correctly loaded")
-                this.setState({upcommingEventsLookingForHelper: res.data.message})
-            }
-            else{
-                console.log("Error while getting upcomming events " + res.data.message)
-            }
-        })
-        .catch(error => { console.log(error)})
-    }
-
-    getIcalData = async () => {
-        await axios.get(
-            '/api/getIcalData?email='+this.props.user.email
-        )
-        .then( (res) => {
-            if(res.data.status === 'success'){
-                console.log("Data has been successfully gotten from ical")
-                this.setState({timetable: res.data.message})
-            }
-            else{
-                console.log("Error while getting ical data " + res.data.message)
-            }
-        })
-        .catch(error => { console.log(error)})
-    }
-
-    addIcal = async () => {
-        await axios.post(
-            '/api/addIcalToUser',
-            {
-                email: this.props.user.email,
-                ical: this.state.ical
-            },
-            { headers: { 'Content-Type': 'application/json' } }
-        )
-        .then( (res) => {
-            if(res.data.status === 'success'){
-                this.getIcalData()
-            }
-            else{
-                console.log("Error while adding ical " + res.data.message)
-            }
-        })
-        .catch(error => { console.log(error)})
-    }
-
-    // Trying to know if the client user is authed on server-side
+    // Get wether a client can access or not the content of this restricted for auths only users page
     content = async () => {
         await axios.get(
             '/api/isAuth?email='+this.props.user.email
         )
         .then( (res) => {
             if(res.data.status === "success"){
+                // Current user is allowed to access the page
                 this.setState({readyToRender: true, logged: true, need: res.data.message})
-                if(this.state.need)
-                    this.getIcalData()
-                else
-                    this.getUpcommingEvents()
             }
             else{
-                
+                // Render the redirection to /
                 this.setState({readyToRender: true})
             }
         })
-        .catch(error => {
-            this.setState({readyToRender: true})
-            console.log(error)
-        })
+        .catch(error => { this.setState({readyToRender: true}); console.log(error) })
     }
 
     render()
     {
         return(
             <div>
-
-                <div style={styles.inscription}>
+                <div style={styles.mainWindow}>
                     { 
                         this.state.readyToRender ?
-                        this.state.logged ? 
-                            <div>
-                                <NavBar logged={true} />
-                                {
-                                    this.state.need ? 
-                                        // User looking for help
-                                        <div>
-                                            <div style={{display: 'flex', marginTop: 50}}>
-                                                <label> ICAL : 
-                                                    <input 
-                                                        type="text" 
-                                                        name="ical" 
-                                                        value={this.state.ical} 
-                                                        onChange={(event) => this.setState({ical: event.target.value})} 
-                                                        placeholder="https://[...].ics" 
-                                                        />
-                                                </label>
-                                                <button onClick={this.addIcal}>GO</button>
-                                            </div>
-                                            <div style={{display: 'inline'}}>
-                                                {
-                                                    this.state.timetable.map( (value) => {
-                                                        return(
-                                                            <div onClick={() => this.setState({showContextualMenu: true, eventForContextualMenu: value})}>
-                                                                <h3>{value.title}</h3>
-                                                                {value.location}
-                                                                {'Du ' + value.startDay + '/' + value.startMonth + '/' + value.startYear + ' à ' + value.startHours + 'h' + value.startMinutes + ' au ' + value.endDay + '/' + value.endMonth + '/' + value.endYear + ' à ' + value.endHours + 'h' + value.endMinutes}
-                                                            </div>
-                                                        )
-                                                    })
-                                                }
-                                            </div>
-                                            {
-                                                this.state.showContextualMenu ? 
-                                                    <div style={{width: 400, left: '50%', top: '50%', position: 'fixed', zIndex: 2, padding: 20, backgroundColor: '#f4f7f8', margin: 10, borderRadius: 8, fontFamily: "Georgia", transform: "translate(-50%, -50%)", shadowOffset:{  width: 20,  height: 20,  }, shadowColor: 'black', shadowOpacity: 1.0, border: '2px solid black'}}>
-                                                        <h3>{this.state.eventForContextualMenu.title}</h3>
-                                                        {this.state.eventForContextualMenu.location}
-                                                        {'Du ' + this.state.eventForContextualMenu.startDay + '/' + this.state.eventForContextualMenu.startMonth + '/' + this.state.eventForContextualMenu.startYear + ' à ' + this.state.eventForContextualMenu.startHours + 'h' + this.state.eventForContextualMenu.startMinutes + ' au ' + this.state.eventForContextualMenu.endDay + '/' + this.state.eventForContextualMenu.endMonth + '/' + this.state.eventForContextualMenu.endYear + ' à ' + this.state.eventForContextualMenu.endHours + 'h' + this.state.eventForContextualMenu.endMinutes}
-                                                        <div onClick={() => this.requestHelp()} style={{color: 'blue'}}>
-                                                            Rechercher un preneur de note pour cette horraire
-                                                        </div>
-                                                    </div>
-                                                    :
-                                                    null
-                                            }
-                                        </div>
-                                        :
-                                        // User looking for helping
-                                        <div>
-                                            {
-                                                this.state.upcommingEventsLookingForHelper.map( (value) => {
-                                                    return(
-                                                        <div>
-                                                            <h3>Prénom du requêtant {value.requester.firstName}</h3>
-                                                            <h4>Nom de l'évenement: {value.event.title}</h4>
-                                                            <h5>Lieu : {value.event.location}</h5>
-                                                            <h5>Date : Du {value.event.startDay}/{value.event.startMonth}/{value.event.startYear} au {value.event.endDay}/{value.event.endMonth}/{value.event.endYear} de {value.event.startHours}h{value.event.startMinutes} au {value.event.endHours}h{value.event.endMinutes}</h5>
-                                                        </div>
-                                                    )
-                                                })
-                                            }
-                                        </div>
-                                }
-                            </div>
-                            : 
-                            <div>
-                                <Redirect to="/" />
-                            </div>
-                            : 
-                            null
-                    }
+                            /** Content is ready to render */
+                            this.state.logged ? 
+                                /** User is allowed to access the content of this page */
+                                <div>
+                                    <NavBar logged={true} />
+                                    { /** Common to every users */}
+                                    {
+                                        this.state.need ? 
+                                            // User looking for help
+                                            <Needers 
+                                                user = {this.props.user}
+                                                />
+                                            :
+                                            // User looking for helping
+                                            <Helpers
+                                                />
+                                    }
+                                </div>
+                                : 
+                                /** User is not allowed to access the content of this page */
+                                <div>
+                                    <Redirect to="/" />
+                                </div>
+                                : 
+                                /** Content is not ready to render */
+                                null
+                        }
                 </div>
             </div>)
     }
@@ -209,7 +82,7 @@ export default Account;
 
 const styles = {
 
-    inscription: {
+    mainWindow: {
         width: '100%',
         height: '110vh',
         display: 'flex',
@@ -217,84 +90,5 @@ const styles = {
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         zIndex: 1
-    },
-    back_button: {
-        position: 'absolute',
-        width: 300,
-        height: 50,
-        left: '50%',
-        top: '45%',
-        border: 'none',
-	    padding: 6,
-	    borderRadius: 8,
-	    background: '#109177',
-	    font: 'bold 13px Arial',
-        color: '#fff',
-        transform: "translate(-50%, -50%)"   
-    },
-    formulaire: {
-
-        width: 400,
-        left: '50%',
-        top: '50%',
-        position: 'absolute',
-        zIndex: 2,
-
-    	padding: 20,
-    	backgroundColor: '#f4f7f8',
-    	margin: 10,
-    	borderRadius: 8,
-    	fontFamily: "Georgia",
-        transform: "translate(-50%, -50%)"
-    },
-
-    number:{
-        background: '#1abc9c',
-
-    	color: '#FFF',
-    	height: 30,
-    	width: 30,
-    	display: 'inline-block',
-    	fontSize: 18,
-    	lineHeight: 1.2,
-    	textAlign: 'center',
-    	textShadow: 'rgba(255,255,255,0.2)',
-    	borderRadius: 15,
-    },
-
-    textArea: {
-        fontFamily: "Georgia",
-    	background: "rgba(255,255,255,.1)",
-    	border: "none",
-    	borderRadius: 4,
-    	fontSize: 12,
-    	margin: 0,
-    	outline: 0,
-    	padding: 10,
-    	width: '100%',
-    	boxSizing: 'border-box',
-    	WebkitBoxSizing: 'border-box',
-    	MozBoxSizing: 'border-box',
-    	backgroundColor: '#e8eeef',
-    	color: '#8a97a0',
-    	WebkitBoxShadow: "rgba(0,0,0,0.03)",
-        boxShadow: "rgba(0,0,0,0.03)",
-        marginBottom: 5
-    },
-
-    submitButton: {
-        position: 'relative',
-	    display: 'block',
-	    padding: '19px 39px 18px 39px',
-        color: '#FFF',
-        margin: 'auto',
-        background: '#1abc9c',
-        fontSize: 18,
-        textAlign: 'center',
-        fontStyle: 'normal',
-        width: '100%',
-        border: '1px solid #16a085',
-        borderWidth: '1px 1px 3px',
-        marginBottom: 10
-    },
+    }
 }
