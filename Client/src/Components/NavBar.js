@@ -19,7 +19,7 @@ export default class NavBar extends Component {
                 {
                     this.props.logged ? 
                             <Link to = "/">
-                                <button onClick={disconnect()} style={styles.connexion_button}>Sign out</button>
+                                <button onClick={disconnect} style={styles.connexion_button}>Sign out</button>
                             </Link>
                             :
                             <div>

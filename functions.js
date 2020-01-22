@@ -39,7 +39,7 @@ exports.__esModule = true;
 var ical = require('node-ical');
 var event_1 = require("./event");
 /** Load a list of event from an ICAL url */
-function parseICALdata(user) {
+function parseICALdata(icalUrl) {
     return __awaiter(this, void 0, void 0, function () {
         var events, i;
         return __generator(this, function (_a) {
@@ -49,7 +49,7 @@ function parseICALdata(user) {
                     i = 0;
                     return [4 /*yield*/, new Promise(function (resolve, reject) {
                             var eventsTab = [];
-                            ical.fromURL(user.ical, {}, function (err, data) {
+                            ical.fromURL(icalUrl, {}, function (err, data) {
                                 for (var k in data) {
                                     i++;
                                     if (data.hasOwnProperty(k)) {
@@ -62,6 +62,7 @@ function parseICALdata(user) {
                                         resolve(eventsTab);
                                     }
                                 }
+                                resolve(eventsTab);
                             });
                         }).then(function (eventsTab) {
                             var eventsToReturn = onlyUpcommingEvents(eventsTab);

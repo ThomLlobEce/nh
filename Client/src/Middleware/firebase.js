@@ -1,6 +1,7 @@
 import * as firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import axios from 'axios'
 
 var firebaseConfig = {
     apiKey: "AIzaSyAP8FaXTgBqA2ykTkVtEDuPCqxiUTZRF1w",
@@ -64,4 +65,84 @@ export async function isAuth() {
             }
         });
     })
+}
+
+export async function getIcalData() {
+        
+        let email = await new Promise( (resolve, reject) => { 
+                        firebase.auth().onAuthStateChanged(function(user) {
+                            if (user) {
+                                resolve(user.email)
+                            } else {
+                                resolve("")
+                            }
+                        });
+                    })
+
+        let icalUrl = await new Promise( (resolve, reject) => {
+                db.collection("Users")
+                    .get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((doc) => {
+                            console.log("Doc :  " + doc.id)
+                            if(doc.id === email){
+                                resolve(doc.data().ical)
+                            }
+                        });
+                    })
+                    .catch( (error) => console.log(error))
+                })
+
+        return await new Promise( (resolve, reject) => {
+            axios.post(
+                '/api/getIcalData',
+                {
+                    ical: icalUrl
+                },
+                { headers: { 'Content-Type': 'application/json' } }
+                )
+                .then( (res) => {
+                    if(res.data.status === 'success'){
+                        console.log("Data successfully fetched")
+                        resolve(res.data.message)
+                    }
+                    else{
+                        console.log("Error while getting ical data " + res.data.message)
+                        resolve([])
+                    }
+                })
+                .catch(error => { console.log(error); resolve([])})
+            })
+}
+
+export async function addIcal(ical) {
+        
+    let email = await new Promise( (resolve, reject) => { 
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                resolve(user.email)
+            } else {
+                resolve("")
+            }
+        });
+    })
+
+    if(email != ""){
+        return await new Promise( (resolve, reject) => {
+            db.collection("Users").doc(email).update({
+                ical: ical
+            })
+            .then( () => {
+                console.log("Document successfully updated !")
+                resolve(true)
+            })
+            .catch( (error) => {
+                console.log("Error updating document : " + error)
+                resolve(false)
+            })
+        })
+    }
+    else{
+        return false
+    }
 }

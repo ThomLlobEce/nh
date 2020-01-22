@@ -1,17 +1,16 @@
 const ical = require('node-ical');
 
 import Event from './event'
-import User from './user'
 
 /** Load a list of event from an ICAL url */
-export async function parseICALdata(user: User){
+export async function parseICALdata(icalUrl: string){
     let events:Event[] = []
     let i = 0
 
     events = await new Promise(
         (resolve, reject) => {
             let eventsTab:Event[] = []
-            ical.fromURL(user.ical, {}, function (err, data) {
+            ical.fromURL(icalUrl, {}, function (err, data) {
                 for (let k in data) {
                     i++
                     if (data.hasOwnProperty(k)) {
@@ -25,6 +24,7 @@ export async function parseICALdata(user: User){
                         resolve(eventsTab)
                     }
                 }
+                resolve(eventsTab)
             })
             
         }).then( (eventsTab:Event[]):Event[] => {

@@ -52,125 +52,41 @@ var eventRequiringHelpers = [];
 app.use(bodyParser.json());
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'Client/build')));
-app.post('/api/addIcalToUser', function (req, res) {
-    console.log("*** API REQUEST (GET) : /api/addIcalToUser ***");
-    console.log("Parameters given : " + req.body);
-    var exist = false;
-    var missingParams = false;
-    var logged = false;
-    // Verifying parameters
-    if (!req.body.email || !req.body.ical) {
-        missingParams = true;
-    }
-    else {
-        // Verifying that the user exists
-        for (var i = 0; i < users.length; i++) {
-            if (users[i].email === req.body.email) {
-                exist = true;
-                // Verifying that the user is logged
-                for (var j = 0; j < auths.length; j++) {
-                    if (auths[j] === req.body.email) {
-                        logged = true;
-                        users[i].addIcal(req.body.ical);
-                    }
-                }
-            }
-        }
-    }
-    if (!exist) {
-        console.log("ERROR : No user " + req.body.email + " exists");
-        res.json({
-            status: "failed",
-            message: "User does not exist"
-        });
-    }
-    else if (missingParams) {
-        console.log("ERROR : Not enough parameters given. Check readme.md to have more informations.");
-        res.json({
-            status: "failed",
-            message: "Missing parameters"
-        });
-    }
-    else if (!logged) {
-        console.log(req.body.email + " is not logged in.");
-    }
-    else {
-        console.log(req.body.ical + " has correctly been added to user with email " + req.body.email);
-        res.json({
-            status: "success",
-            message: "Ical added"
-        });
-    }
-});
-app.get('/api/getIcalData', function (req, res) {
+app.post('/api/getIcalData', function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var exist, missingParams, logged, user, i, j, events;
+        var events;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     console.log("*** API REQUEST (GET) : /api/getIcalData ***");
                     console.log("Parameters given : " + JSON.stringify(req.body));
-                    exist = false;
-                    missingParams = false;
-                    logged = false;
-                    user = -1;
-                    // Verifying parameters
-                    if (!req.query.email) {
-                        missingParams = true;
-                    }
-                    else {
-                        // Verifying that the user exists
-                        for (i = 0; i < users.length; i++) {
-                            if (users[i].email === req.query.email) {
-                                exist = true;
-                                // Verifying that the user is logged
-                                for (j = 0; j < auths.length; j++) {
-                                    if (auths[j] === req.query.email) {
-                                        logged = true;
-                                        user = i;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (!!exist) return [3 /*break*/, 1];
-                    console.log("ERROR : No user " + req.query.email + " exists");
-                    res.json({
-                        status: "failed",
-                        message: "User does not exist"
-                    });
-                    return [3 /*break*/, 6];
-                case 1:
-                    if (!missingParams) return [3 /*break*/, 2];
+                    if (!!req.body.ical) return [3 /*break*/, 1];
                     console.log("ERROR : Not enough parameters given. Check readme.md to have more informations.");
                     res.json({
                         status: "failed",
                         message: "Missing parameters"
                     });
-                    return [3 /*break*/, 6];
+                    return [3 /*break*/, 3];
+                case 1: return [4 /*yield*/, functions_1.parseICALdata(req.body.ical)];
                 case 2:
-                    if (!!logged) return [3 /*break*/, 3];
-                    console.log(req.query.email + " is not logged in.");
-                    return [3 /*break*/, 6];
-                case 3:
-                    if (!(user != -1)) return [3 /*break*/, 5];
-                    return [4 /*yield*/, functions_1.parseICALdata(users[user])];
-                case 4:
                     events = _a.sent();
-                    console.log("Data successfully fetched");
-                    res.json({
-                        status: "success",
-                        message: events
-                    });
-                    return [3 /*break*/, 6];
-                case 5:
-                    console.log("Internal error.");
-                    res.json({
-                        status: "failed",
-                        message: "internal server error."
-                    });
-                    _a.label = 6;
-                case 6: return [2 /*return*/];
+                    console.log(events);
+                    if (events.length > 0) {
+                        console.log("Data successfully fetched");
+                        res.json({
+                            status: "success",
+                            message: events
+                        });
+                    }
+                    else {
+                        console.log("Return empty set, url specified may not work");
+                        res.json({
+                            status: "failed",
+                            message: "Return empty set, url specified may not work"
+                        });
+                    }
+                    _a.label = 3;
+                case 3: return [2 /*return*/];
             }
         });
     });
