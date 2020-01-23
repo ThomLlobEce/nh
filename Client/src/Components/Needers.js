@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-import { getIcalData, addIcal } from '../Middleware/firebase'
+import { getIcalData, addIcal, requestHelp } from '../Middleware/firebase'
 
 // Components for /dashboard url showing the needers-only content
 class Needers extends Component {
@@ -22,33 +22,11 @@ class Needers extends Component {
         this.setState({timetable: await getIcalData()})
     }
 
-    /** Method for submitting to the server a event that needs a helper & the profile of the requester (current user) */
-    requestHelp = async () => {
-        await axios.post(
-            '/api/addHelpRequest',
-            {
-                requester: this.props.user,
-                event: this.state.eventForContextualMenu
-            },
-            { headers: { 'Content-Type': 'application/json' } }
-        )
-        .then( (res) => {
-            if(res.data.status === 'success'){
-                console.log("Request has correctly been submited")
-                this.setState({showContextualMenu: false, eventForContextualMenu: null})
-            }
-            else{
-                console.log("Error while getting ical data " + res.data.message)
-            }
-        })
-        .catch(error => { console.log(error)})
-    }
-
     render()
     {
         return(
             <div>
-                <div style={{display: 'flex', marginTop: 50}}>
+                <div style={{display: 'flex', marginTop: 70, marginLeft: 50}}>
                     <label> ICAL : 
                         <input 
                             type="text" 
@@ -58,13 +36,15 @@ class Needers extends Component {
                             placeholder="https://[...].ics" 
                         />
                     </label>
-                    <button onClick={() => { addIcal(this.state.ical); this.init() }}>GO</button>
+                    <button onClick={() => { addIcal(this.state.ical); this.init(); }}>GO</button>
                 </div>
-                <div style={{display: 'inline'}}>
+                <div style={styles.upcommingCourseTitle}>Vos prochains cours : </div>
+                <div style={styles.upcommingCourse}>
+                    <div style={{display: 'inline'}}>
                     {
                         this.state.timetable.map( (value) => {
                             return(
-                                <div onClick={() => this.setState({showContextualMenu: true, eventForContextualMenu: value})}>
+                                <div onClick={() => this.setState({showContextualMenu: true, eventForContextualMenu: value})} style={{border: '1px solid black', padding: 5}}>
                                     <h3>{value.title}</h3>
                                     {value.location}
                                     {'Du ' + value.startDay + '/' + value.startMonth+1 + '/' + value.startYear + ' à ' + value.startHours + 'h' + value.startMinutes + ' au ' + value.endDay + '/' + value.endMonth+1 + '/' + value.endYear + ' à ' + value.endHours + 'h' + value.endMinutes}
@@ -72,6 +52,7 @@ class Needers extends Component {
                                 )
                             })
                     }
+                    </div>
                 </div>
                 {
                     this.state.showContextualMenu ? 
@@ -79,16 +60,51 @@ class Needers extends Component {
                             <h3>{this.state.eventForContextualMenu.title}</h3>
                             {this.state.eventForContextualMenu.location}
                             {'Du ' + this.state.eventForContextualMenu.startDay + '/' + this.state.eventForContextualMenu.startMonth+1 + '/' + this.state.eventForContextualMenu.startYear + ' à ' + this.state.eventForContextualMenu.startHours + 'h' + this.state.eventForContextualMenu.startMinutes + ' au ' + this.state.eventForContextualMenu.endDay + '/' + this.state.eventForContextualMenu.endMonth+1 + '/' + this.state.eventForContextualMenu.endYear + ' à ' + this.state.eventForContextualMenu.endHours + 'h' + this.state.eventForContextualMenu.endMinutes}
-                            <div onClick={() => this.requestHelp()} style={{color: 'blue'}}>
+                            <div onClick={() => requestHelp(this.state.eventForContextualMenu)} style={{color: 'blue'}}>
                                 Rechercher un preneur de note pour cette horraire
                             </div>
                         </div>
                         :
                         null
                 }
+                <div style={styles.theyWantToHelpYouTitle}>Ils veulent vous aider : </div>
+                <div style={styles.theyWantToHelpYou}>
+                    <div style={{display: 'inline'}}>
+                    {
+                        
+                    }
+                    </div>
+                </div>
             </div>
         )
     }
 }
 
 export default Needers;
+
+const styles = {
+    upcommingCourse: {
+        width: '25%',
+        marginLeft: 50,
+        marginTop: 15,
+        padding: 20,
+        border: '1px solid black ',
+        shadowOffset:{  width: 10,  height: 10,  },
+        shadowColor: 'black',
+        shadowOpacity: 1.0,  
+    },
+    upcommingCourseTitle: {
+        font: 'bold 18px Arial',
+        width: '25%',
+        marginLeft: 50,
+        marginTop: 15
+    },
+    theyWantToHelpYouTitle: {
+        position: 'absolute',
+        font: 'bold 18px Arial',
+        width: '25%',
+        right: 50,
+        top: 70,
+        marginTop: 15
+    }
+}

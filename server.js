@@ -40,15 +40,16 @@ var express = require('express');
 var path = require('path');
 var app = express();
 var bodyParser = require('body-parser');
-var user_1 = require("./user");
+var nodemailer = require('nodemailer');
 var functions_1 = require("./functions");
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'nanterrehang@gmail.com',
+        pass: 'AzertyuioP'
+    }
+});
 // https://planning-paris.inseecu.net/Telechargements/ical/Edt_LLOBREGAT.ics?version=2019.0.4.0&idICal=ED8C99CB6BE8F57EC536877E01FC1D6F&param=643d5b312e2e36325d2666683d3126663d31
-var users = [
-    new user_1["default"]("Llobregat", "Thomas", "a@gmail.com", "54", 2020, "gter", "a", true),
-    new user_1["default"]("Babel", "Mattis", "b@gmail.com", "54", 2020, "gter", "b", false)
-];
-var auths = [];
-var eventRequiringHelpers = [];
 app.use(bodyParser.json());
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'Client/build')));
@@ -70,7 +71,6 @@ app.post('/api/getIcalData', function (req, res) {
                 case 1: return [4 /*yield*/, functions_1.parseICALdata(req.body.ical)];
                 case 2:
                     events = _a.sent();
-                    console.log(events);
                     if (events.length > 0) {
                         console.log("Data successfully fetched");
                         res.json({
@@ -91,67 +91,39 @@ app.post('/api/getIcalData', function (req, res) {
         });
     });
 });
-app.post('/api/addHelpRequest', function (req, res) {
-    console.log("*** API REQUEST (GET) : /api/addHelpRequest ***");
+app.post('/api/sendEmail', function (req, res) {
+    console.log("*** API REQUEST (GET) : /api/getIcalData ***");
     console.log("Parameters given : " + JSON.stringify(req.body));
-    var exist = false;
-    var missingParams = false;
-    // Verifying parameters
-    if (!req.body.requester || !req.body.event) {
-        missingParams = true;
-    }
-    else {
-        var _loop_1 = function () {
-            if (users[i].email === req.body.requester.email) {
-                exist = true;
-                // Adding the user and the event to DB
-                var months_1 = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                eventRequiringHelpers.push({ requester: req.body.requester, event: req.body.event });
-                eventRequiringHelpers.sort(function (a, b) {
-                    var first = new Date(months_1[parseInt(a.event.startMonth)] + '-' + a.event.startDay + ', ' + a.event.startYear + ' ' + a.event.startHours + ':' + a.event.startMinutes + ':00');
-                    var second = new Date(months_1[parseInt(b.event.startMonth)] + '-' + b.event.startDay + ', ' + b.event.startYear + ' ' + b.event.startHours + ':' + b.event.startMinutes + ':00');
-                    return first > second ? 1 : first < second ? -1 : 0;
-                });
-                console.log("Event and requester correctly added to DB : " + JSON.stringify({ requester: req.body.requester, event: req.body.event }));
-            }
+    if (req.body.to && req.body.subject && req.body.text) {
+        var mailOptions = {
+            from: 'nanterreHang@gmail.com',
+            to: req.body.to,
+            subject: req.body.subject,
+            html: req.body.text
         };
-        // Verifying that the helper exists
-        for (var i = 0; i < users.length; i++) {
-            _loop_1();
-        }
-    }
-    if (!exist) {
-        console.log("ERROR : No user " + req.body.requester.email + " exists");
-        res.json({
-            status: "failed",
-            message: "User does not exist"
-        });
-    }
-    else if (missingParams) {
-        console.log("ERROR : Not enough parameters given. Check readme.md to have more informations.");
-        res.json({
-            status: "failed",
-            message: "Missing parameters"
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+                res.json({
+                    status: 'failed',
+                    message: error
+                });
+            }
+            else {
+                console.log('Email sent: ' + info.response);
+                res.json({
+                    status: 'success',
+                    message: 'Email sent: ' + info.response
+                });
+            }
         });
     }
     else {
         res.json({
-            status: "success",
-            message: "Event correctly added to DB"
+            status: 'failed',
+            message: 'Not enough parameters given'
         });
     }
-});
-app.get('/api/getUpcommingEvents', function (req, res) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            console.log("*** API REQUEST (GET) : /api/getUpcommingEvents ***");
-            res.json({
-                status: "success",
-                message: eventRequiringHelpers
-            });
-            return [2 /*return*/];
-        });
-    });
 });
 // Handles any requests that don't match the ones above
 app.get('*', function (req, res) {

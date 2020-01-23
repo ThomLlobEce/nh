@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import axios from 'axios'
+import { getUpcommingEventsLookingForHelpers } from '../Middleware/firebase'
+import MouseOverButton from './MouseOverButton';
+import { submit } from '../Middleware/firebase'
 
 // Components for /dashboard url, showing the helpers-only content
 class Helpers extends Component {
@@ -7,42 +9,36 @@ class Helpers extends Component {
     constructor(props){
         super(props)
 
+        this.state = {
+            upcommingEventsLookingForHelpers: [] // Contains the upcoming events looking for helpers for the need=false users
+        }
+
         this.getUpcommingEventsLookingForHelpers() // Getting upcomming events from server
     }
 
-    state = {
-        upcommingEventsLookingForHelpers: [] // Contains the upcoming events looking for helpers for the need=false users
-    }
+    
 
     /** Method for loading from server the upcomming events looking for helpers */
     getUpcommingEventsLookingForHelpers = async () => {
-        await axios.get(
-            '/api/getUpcommingEvents'
-        )
-        .then( (res) => {
-            if(res.data.status === 'success'){
-                console.log("Upcomming events correctly loaded")
-                this.setState({upcommingEventsLookingForHelpers: res.data.message})
-            }
-            else{
-                console.log("Error while getting upcomming events " + res.data.message)
-            }
-        })
-        .catch(error => { console.log(error)})
+        this.setState({upcommingEventsLookingForHelpers: await getUpcommingEventsLookingForHelpers()})
+        
     }
 
     render()
     {
         return(
             <div>
+                
+                {console.log(this.state.upcommingEventsLookingForHelpers)}
             {
                 this.state.upcommingEventsLookingForHelpers.map( (value) => {
                     return(
                         <div>
-                            <h3>Prénom du requêtant {value.requester.firstName}</h3>
-                            <h4>Nom de l'évenement: {value.event.title}</h4>
-                            <h5>Lieu : {value.event.location}</h5>
-                            <h5>Date : Du {value.event.startDay}/{value.event.startMonth+1}/{value.event.startYear} au {value.event.endDay}/{value.event.endMonth+1}/{value.event.endYear} de {value.event.startHours}h{value.event.startMinutes} au {value.event.endHours}h{value.event.endMinutes}</h5>
+                            <h3>Prénom du requêtant {value.requester}</h3>
+                            <h4>Nom de l'évenement: {value.title}</h4>
+                            <h5>Lieu : {value.location}</h5>
+                            <h5>Date : Du {} au {}</h5>
+                            <MouseOverButton text="Postuler" style={styles.submitButton} style_over={styles.submitButton_over} onClick ={() => submit(value)} />
                         </div>
                     )
                 })
@@ -52,3 +48,37 @@ class Helpers extends Component {
 }
 
 export default Helpers;
+
+const styles = {
+    submitButton: {
+        position: 'relative',
+	    display: 'block',
+	    padding: '19px 39px 18px 39px',
+        color: '#FFF',
+        margin: 'auto',
+        background: '#EC670A',
+        fontSize: 18,
+        textAlign: 'center',
+        fontStyle: 'normal',
+        width: '100%',
+        border: '1px solid #EC670A',
+        borderWidth: '1px 1px 3px',
+        marginBottom: 10
+    },
+
+    submitButton_over: {
+        position: 'relative',
+	    display: 'block',
+	    padding: '19px 39px 18px 39px',
+        color: '#FFF',
+        margin: 'auto',
+        background: '#EC8E0A',
+        fontSize: 18,
+        textAlign: 'center',
+        fontStyle: 'normal',
+        width: '100%',
+        border: '1px solid #EC8E0A',
+        borderWidth: '1px 1px 3px',
+        marginBottom: 10
+    }
+}

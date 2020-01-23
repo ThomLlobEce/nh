@@ -69,7 +69,8 @@ export default class FormSignUp extends Component {
             && this.state.error[5] === "" && this.state.error[6] === ""){
                 // The form is correctly formatted
                 // Creating user
-                let creation = createUser(this.state.email, this.state.password)
+                let creation =  await createUser(this.state.email, this.state.password, this.state.cm, this.state.first_name, this.state.last_name, this.props.role, this.state.ufr, this.state.year )
+                console.log(creation)
                 if(creation){
                     this.props.connexion()
                 }

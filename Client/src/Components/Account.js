@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import Needers from './Needers';
 import Helpers from './Helpers';
 import User from './User'
-import { isAuth } from '../Middleware/firebase'
+import { isAuth, getNeedStatus } from '../Middleware/firebase'
 
 // Components for /dashboard url
 export default class Account extends Component {
@@ -25,7 +25,7 @@ export default class Account extends Component {
     // Get wether a client can access or not the content of this restricted for auths only users page
     content = async () => {
         if(await isAuth()){
-            this.setState({readyToRender: true, logged: true, need: true})
+            this.setState({readyToRender: true, logged: true, need: await getNeedStatus()})
         }
         else{
             this.setState({readyToRender: true, logged: false})
