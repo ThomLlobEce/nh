@@ -83,10 +83,10 @@ nh
 |   |   |   README.md 
 |   |   |
 │   |   └─── Components
-│   |   │   Account.js // Components for route /dashboard
+│   |   │   Account.js // Components for route /
 │   |   │   FormSignIn.js // Components for the registration form
 |   |   |   FormSignUp.js // Components for the login form
-|   |   |   Home.js // Components for route /
+|   |   |   Home.js // Components for route /Home
 |   |   |   HomeInformationItem.js // Components for the pre-footer informations
 |   |   |   NavBar.js // Components for the navigation bar
 |   |   |   SignUp.js // Components managing the sign up (whether it is for a needer or helper account)

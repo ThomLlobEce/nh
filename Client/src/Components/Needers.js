@@ -1,8 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, useContext } from 'react';
 import axios from 'axios'
-import { getIcalData, addIcal, requestHelp } from '../Middleware/firebase'
+import { getIcalData, addIcal, requestHelp, getTheyWantToHelpYou, validateHelper, db} from '../Middleware/firebase'
 
-// Components for /dashboard url showing the needers-only content
+// Components for / url showing the needers-only content
 class Needers extends Component {
 
     constructor(props){
@@ -13,14 +13,28 @@ class Needers extends Component {
             timetable: [], // Contains the upcomming events
             showContextualMenu: false, // Wether the contextual menu should be print or not
             eventForContextualMenu: null, // Contains the specific upcomming event to show in the contextual menu
+            theyWantToHelpYou: [], // Contains every request of help concerning the current user,
+            init: false
         }
 
-        this.init()        
+        this.init()
+        this.listen()   
     }
 
-    async init() {
-        this.setState({timetable: await getIcalData()})
+
+    init = async () => {
+        console.log("Loading ...")
+        this.setState({timetable: await getIcalData(), theyWantToHelpYou: await getTheyWantToHelpYou()})
     }
+
+    listen = () => {
+        db.collection('EventsRequiringHelp')
+            .onSnapshot(() => { 
+                console.log("Changes occured !")
+                this.init()
+            })
+    }
+    
 
     render()
     {
@@ -39,12 +53,11 @@ class Needers extends Component {
                     <button onClick={() => { addIcal(this.state.ical); this.init(); }}>GO</button>
                 </div>
                 <div style={styles.upcommingCourseTitle}>Vos prochains cours : </div>
-                <div style={styles.upcommingCourse}>
-                    <div style={{display: 'inline'}}>
+                <div style={{display: 'inline'}}>
                     {
-                        this.state.timetable.map( (value) => {
+                        this.state.timetable.map( (value, index) => {
                             return(
-                                <div onClick={() => this.setState({showContextualMenu: true, eventForContextualMenu: value})} style={{border: '1px solid black', padding: 5}}>
+                                <div onClick={() => this.setState({showContextualMenu: true, eventForContextualMenu: value})} style={upcommingCourse(index)}>
                                     <h3>{value.title}</h3>
                                     {value.location}
                                     {'Du ' + value.startDay + '/' + value.startMonth+1 + '/' + value.startYear + ' à ' + value.startHours + 'h' + value.startMinutes + ' au ' + value.endDay + '/' + value.endMonth+1 + '/' + value.endYear + ' à ' + value.endHours + 'h' + value.endMinutes}
@@ -52,7 +65,6 @@ class Needers extends Component {
                                 )
                             })
                     }
-                    </div>
                 </div>
                 {
                     this.state.showContextualMenu ? 
@@ -71,7 +83,21 @@ class Needers extends Component {
                 <div style={styles.theyWantToHelpYou}>
                     <div style={{display: 'inline'}}>
                     {
-                        
+                        this.state.theyWantToHelpYou.map( (value, index) => {
+                            return(
+                                <div style={StyleTheyWantToHelpYou(index)}>
+                                    <h3>{value.title}</h3>
+                                    {value.location}
+                                    {
+                                        value.potentHelper.map( (val, index) => {
+                                            return (
+                                                <div onClick = {() => {validateHelper(val.email, value) }}>{val.email}</div>
+                                            )
+                                        })
+                                    }                                    
+                                </div>
+                                )
+                            })   
                     }
                     </div>
                 </div>
@@ -82,21 +108,73 @@ class Needers extends Component {
 
 export default Needers;
 
+
+const colors = ["#ADBF94",  "#E1EEF3", "#E4C4D0", "#DFCAD6", "#BF94A2", "#EFE5EC", "#CC9188"]
+
+let last_color_left = -1
+let last_color_right = -1
+
+function StyleTheyWantToHelpYou(offset){
+
+    let r = -2
+    do{
+         r = Math.floor(Math.random()*colors.length)
+    }while(last_color_right === r)
+
+    last_color_right = r
+
+    return (
+        {
+            position: 'absolute',
+            font: 'bold 18px Arial',
+            width: '25%',
+            right: 50,
+            height: 180,
+            top: 150+250*offset,
+            marginTop: 5,
+            padding: 20,
+            border: '1px solid black ',
+            shadowOffset:{  width: 10,  height: 10,  },
+            shadowColor: 'black',
+            shadowOpacity: 1.0,  
+            backgroundColor: `${colors[r]}`
+        }
+    )
+}
+
+function upcommingCourse(offset){
+    let r = -2
+    do{
+         r = Math.floor(Math.random()*colors.length)
+    }while(last_color_left === r)
+
+    last_color_left = r
+    
+    return (
+        {
+            position: 'absolute',
+            font: 'bold 18x Arial',
+            width: '25%',
+            height: 180,
+            left: 50,
+            top: 150+200*offset,
+            padding: 20,
+            border: '1px solid black ',
+            shadowOffset:{  width: 10,  height: 10,  },
+            shadowColor: 'black',
+            shadowOpacity: 1.0,  
+            backgroundColor: `${colors[r]}`
+        }
+    )
+}
+
 const styles = {
-    upcommingCourse: {
-        width: '25%',
-        marginLeft: 50,
-        marginTop: 15,
-        padding: 20,
-        border: '1px solid black ',
-        shadowOffset:{  width: 10,  height: 10,  },
-        shadowColor: 'black',
-        shadowOpacity: 1.0,  
-    },
     upcommingCourseTitle: {
+        position: 'absolute',
         font: 'bold 18px Arial',
         width: '25%',
-        marginLeft: 50,
+        left: 50,
+        top: 110,
         marginTop: 15
     },
     theyWantToHelpYouTitle: {
@@ -104,7 +182,7 @@ const styles = {
         font: 'bold 18px Arial',
         width: '25%',
         right: 50,
-        top: 70,
+        top: 110,
         marginTop: 15
     }
 }

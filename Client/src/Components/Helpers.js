@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { getUpcommingEventsLookingForHelpers } from '../Middleware/firebase'
 import MouseOverButton from './MouseOverButton';
-import { submit } from '../Middleware/firebase'
+import { submit, db} from '../Middleware/firebase'
 
 // Components for /dashboard url, showing the helpers-only content
 class Helpers extends Component {
@@ -14,8 +14,16 @@ class Helpers extends Component {
         }
 
         this.getUpcommingEventsLookingForHelpers() // Getting upcomming events from server
+        this.listen()
     }
 
+    listen = () => {
+        db.collection('EventsRequiringHelp')
+            .onSnapshot(() => { 
+                console.log("Changes occured !")
+                this.getUpcommingEventsLookingForHelpers()
+            })
+    }
     
 
     /** Method for loading from server the upcomming events looking for helpers */

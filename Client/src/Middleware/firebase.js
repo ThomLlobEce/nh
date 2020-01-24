@@ -17,11 +17,10 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-var db = firebase.firestore()
+export const db = firebase.firestore()
 
-
-async function getEmail(){
-    return new Promise( (resolve, reject) => { 
+async function getUser(){
+    let email = await new Promise( (resolve, reject) => { 
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
                 resolve(user.email)
@@ -30,6 +29,21 @@ async function getEmail(){
             }
         });
     })
+    if(email){
+        return await new Promise( (resolve, reject) => {
+            db.collection("Users").get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        if(doc.id === email){
+                            resolve({...doc.data(), email: email})
+                        }
+                    });
+            })
+            .catch( (error) => {console.log(error); resolve({})})
+        })
+    } else {
+        return {}
+    }
 }
 
 export async function createUser(email, password, cm, firstName, name, need, ufr, year){
@@ -102,7 +116,7 @@ export async function isAuth() {
 
 export async function getIcalData() {
         
-        let email = await getEmail()
+        let email = (await getUser()).email
 
         let icalUrl = await new Promise( (resolve, reject) => {
                 db.collection("Users")
@@ -141,7 +155,7 @@ export async function getIcalData() {
 
 export async function addIcal(ical) {
         
-    let email = await getEmail()
+    let email = (await getUser()).email
 
     if(email != ""){
         return await new Promise( (resolve, reject) => {
@@ -166,7 +180,7 @@ export async function addIcal(ical) {
 export async function requestHelp(event){
     let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 
-    let email = await getEmail()
+    let email = (await getUser()).email
 
     if(email != ""){
         return await new Promise( (resolve, reject) => {
@@ -193,16 +207,17 @@ export async function requestHelp(event){
 }
 
 export async function getUpcommingEventsLookingForHelpers(){
-    let email = await getEmail()
+    let email = (await getUser()).email
 
     if(email != ""){
         return await new Promise( (resolve, reject) => {
             let upcommingEvent = []
             db.collection("EventsRequiringHelp").orderBy("start").get().then( function(querySnapshot) {
                 querySnapshot.forEach(function(doc) {
-                    upcommingEvent.push(doc.data())
-                })                
-                resolve(upcommingEvent)
+                    if(!doc.data().helper)
+                        upcommingEvent.push(doc.data())
+                    })                
+                    resolve(upcommingEvent)
             })
             .catch(function(error) {
                 console.error("Error writing document: ", error);
@@ -216,13 +231,15 @@ export async function getUpcommingEventsLookingForHelpers(){
 }
 
 export async function getNeedStatus(){
-    let email = await getEmail()
+    let user = await getUser()
 
-    if(email != ""){
+    console.log(user)
+
+    if(user.email != ""){
         return await new Promise( (resolve, reject) => {
             db.collection("Users").get().then( function(querySnapshot) {
                 querySnapshot.forEach(function(doc) {
-                    if(doc.id === email){
+                    if(doc.id === user.email){
                         resolve(doc.data().need)
                     }                   
                 })       
@@ -239,28 +256,149 @@ export async function getNeedStatus(){
 
 }
 
+export async function addPotentHelper(user, ev){
+    let id = await getEventsRequiringHelpId(ev)
+    if(id != -1){
+        return await new Promise( (resolve, reject) => {
+            db.collection("EventsRequiringHelp").doc(id).set({
+                potentHelper: [user]
+            }, { merge: true })
+            .then(function() {
+                console.log("Document successfully written!");
+                resolve (true)
+            })
+            .catch(function(error) {
+                console.error("Error writing document: ", error);
+                resolve(false)
+            });
+        })
+    } else {
+        console.log("Received id = " + id +" meaning event was not found")
+        return false
+    }
+}
+
 export async function submit(event){
-    axios.post(
-        '/api/sendEmail',
-        {
-            to: event.requester,
-            subject: "Quelqu'un veut vous aider sur un événement !",
-            text: "<b>" + await getEmail() + " souhaite vous aider pour l'évenement suivant :</b>"
-                + "<p> Nom de l'événement : " + event.title + '\n'
-                + "Date de l'événement : " + '\n'
-                + "Lieu de l'événement : " + event.location + '\n'
-                + "Si vous souhaitez participer à cette événement, cliquez sur le lien suivant : "
-                + "<a href=\"http://localhost:5000\">http://localhost:5000</a></p>"
-        },
-        { headers: { 'Content-Type': 'application/json' } }
-    )
-    .then( (res) => {
-        if(res.data.status === 'success'){
-            console.log("Mail sent !")
-        }
-        else{
-            console.log(res.data.message)
-        }
+    let user = await getUser()
+
+    let ok = await addPotentHelper(user, event)
+
+    if(ok){
+        axios.post(
+            '/api/sendEmail',
+            {
+                to: event.requester,
+                subject: "Quelqu'un veut vous aider sur un événement !",
+                text: "<b>" + (await getUser()).email + " souhaite vous aider pour l'évenement suivant :</b>"
+                    + "<p> Nom de l'événement : " + event.title + '\n'
+                    + "Date de l'événement : " + '\n'
+                    + "Lieu de l'événement : " + event.location + '\n'
+                    + "Si vous souhaitez participer à cette événement, cliquez sur le lien suivant : "
+                    + "<a href=\"http://localhost:5000\">http://localhost:5000</a></p>"
+            },
+            { headers: { 'Content-Type': 'application/json' } }
+        )
+        .then( (res) => {
+            if(res.data.status === 'success'){
+                console.log("Mail sent !")
+            }
+            else{
+                console.log(res.data.message)
+            }
+        })
+        .catch(error => { console.log(error);})
+    }
+}
+
+export async function getTheyWantToHelpYou(){
+
+    let email = (await getUser()).email
+
+    if(email != ""){
+        return await new Promise( (resolve, reject) => {
+            let theyWantToHelpYou = []
+            db.collection("EventsRequiringHelp").get().then( function(querySnapshot) {
+                querySnapshot.forEach(function(doc) {
+                    if(doc.data().requester === email && doc.data().potentHelper){
+                        theyWantToHelpYou.push(doc.data())
+                    }                   
+                })
+                console.log("theyWantToHelpYou successfully fetched : " + JSON.stringify(theyWantToHelpYou))
+                resolve(theyWantToHelpYou)      
+            })
+            .catch(function(error) {
+                console.error("Error getting people that wants to help you: ", error);
+                resolve([])
+            });
+        })
+    }
+    else{
+        console.error("No user logged");
+        return []
+    }
+
+}
+
+async function getEventsRequiringHelpId(ev){
+    return await new Promise( (resolve, reject) => {
+        db.collection("EventsRequiringHelp").get().then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                let docstart = new Date(doc.data().start.seconds)
+                let docend = new Date(doc.data().end.seconds)
+                let evstart = new Date(ev.start.seconds)
+                let evend = new Date(ev.end.seconds)
+                if(doc.data().title === ev.title && doc.data().location === ev.location && doc.data().requester === ev.requester){
+                    resolve(doc.id)
+                }
+            })
+            resolve(-1)
+        })
+        .catch(function(error) {
+            console.error("Error writing document: ", error);
+            resolve(-1)
+        });
     })
-    .catch(error => { console.log(error);})
+}
+
+export async function validateHelper(helper, event){
+
+    let del = false
+
+    let id = await new Promise( async (resolve, reject) => {
+        let id = await getEventsRequiringHelpId(event)
+
+        db.collection("EventsRequiringHelp").get().then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                if(doc.id === id){
+                    // verify that email is in field potentHelper
+                    doc.data().potentHelper.forEach( (value) => {
+                        if(value.email === helper){
+                            del = true
+                            resolve(id)
+                        }
+                    })
+                }
+            })
+            resolve(-1)
+        })
+        .catch(function(error) {
+            console.error("Error writing document: ", error);
+            resolve(-1)
+        });
+    })
+
+    if(del && id != -1){
+        // delete field potentHelper
+        await new Promise( async (resolve, reject) => {
+            db.collection('EventsRequiringHelp').doc(id).update({
+                potentHelper: firebase.firestore.FieldValue.delete()
+            });
+            resolve()
+        })
+        
+        // set new field helper to value email
+        db.collection("EventsRequiringHelp").doc(id).update({
+            helper: helper
+        })
+    }
 }

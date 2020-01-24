@@ -55,7 +55,7 @@ function parseICALdata(icalUrl) {
                                     if (data.hasOwnProperty(k)) {
                                         var ev = data[k];
                                         if (data[k].type == 'VEVENT' && ev.summary && ev.location) {
-                                            eventsTab.push(new event_1["default"](ev.summary.val, ev.location.val, ev.start.getMinutes(), ev.start.getHours(), ev.start.getDate(), ev.start.getMonth(), 1900 + ev.start.getYear(), ev.end.getMinutes(), ev.end.getHours(), ev.end.getDate(), ev.end.getMonth(), 1900 + ev.end.getYear()));
+                                            eventsTab.push(new event_1["default"](ev.summary.val || ev.summary, ev.location.val || ev.location, ev.start.getMinutes(), ev.start.getHours(), ev.start.getDate(), ev.start.getMonth(), 1900 + ev.start.getYear(), ev.end.getMinutes(), ev.end.getHours(), ev.end.getDate(), ev.end.getMonth(), 1900 + ev.end.getYear()));
                                         }
                                     }
                                     if (i === Object.keys(data).length) {

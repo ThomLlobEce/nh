@@ -12,8 +12,8 @@ class App extends Component {
                 <div className="App-content">
                     <Router>
                         <Switch>
-                            <Route exact path="/" render={(props) => <Home {...props} />}/>
-                            <Route exact path='/dashboard' render={(props) => <Account {...props} />}/>
+                            <Route exact path="/Home" render={(props) => <Home {...props} />}/>
+                            <Route exact path='/' render={(props) => <Account {...props} />}/>
                         </Switch>
                     </Router>
                 </div>

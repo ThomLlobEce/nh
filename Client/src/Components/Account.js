@@ -6,7 +6,7 @@ import Helpers from './Helpers';
 import User from './User'
 import { isAuth, getNeedStatus } from '../Middleware/firebase'
 
-// Components for /dashboard url
+// Components for / url
 export default class Account extends Component {
 
     constructor(props){
@@ -55,7 +55,7 @@ export default class Account extends Component {
                                 : 
                                 /** User is not allowed to access the content of this page */
                                 <div>
-                                    <Redirect to="/" />
+                                    <Redirect to="/Home" />
                                 </div>
                             : 
                             /** Content is not ready to render */

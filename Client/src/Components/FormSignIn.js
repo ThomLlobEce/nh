@@ -57,7 +57,7 @@ export default class FormSignIn extends Component {
             <div>
                 { 
                     // if a redirect is required, not rendering this component. 
-                    this.state.redirect ? <Redirect to='/dashboard'/> : null
+                    this.state.redirect ? <Redirect to='/'/> : null
                 }
                 <div style={styles.formulaire}>
                     <label style={styles.legend}>
