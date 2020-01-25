@@ -15,6 +15,9 @@ var Event = /** @class */ (function () {
         this.endMinutes = endMinutes;
         this.endHours = endHours;
     }
+    Event.prototype.addColor = function (color) {
+        this.color = color;
+    };
     return Event;
 }());
 exports["default"] = Event;

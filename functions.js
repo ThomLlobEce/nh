@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var ical = require('node-ical');
 var event_1 = require("./event");
+var colors = ["#ADBF94", "#E1EEF3", "#E4C4D0", "#DFCAD6", "#BF94A2", "#EFE5EC", "#CC9188"];
 /** Load a list of event from an ICAL url */
 function parseICALdata(icalUrl) {
     return __awaiter(this, void 0, void 0, function () {
@@ -70,7 +71,7 @@ function parseICALdata(icalUrl) {
                         })];
                 case 1:
                     events = _a.sent();
-                    return [2 /*return*/, events];
+                    return [2 /*return*/, addColors(events)];
             }
         });
     });
@@ -93,4 +94,16 @@ function onlyUpcommingEvents(ev) {
         return first > second ? 1 : first < second ? -1 : 0;
     });
     return eventsToReturn;
+}
+function addColors(events) {
+    var last_color = -1;
+    var r = -2;
+    events.forEach(function (value) {
+        do {
+            r = Math.floor(Math.random() * colors.length);
+        } while (last_color === r);
+        last_color = r;
+        value.addColor(colors[r]);
+    });
+    return events;
 }

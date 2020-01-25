@@ -1,5 +1,5 @@
 import React, { Component, useContext } from 'react';
-import axios from 'axios'
+import UpcomingCourse from './UpcomingCourse'
 import { getIcalData, addIcal, requestHelp, getTheyWantToHelpYou, validateHelper, db} from '../Middleware/firebase'
 
 // Components for / url showing the needers-only content
@@ -27,11 +27,16 @@ class Needers extends Component {
         this.setState({timetable: await getIcalData(), theyWantToHelpYou: await getTheyWantToHelpYou()})
     }
 
+    loadChanges = async () => {
+        console.log("Loading ...")
+        this.setState({theyWantToHelpYou: await getTheyWantToHelpYou()})
+    }
+
     listen = () => {
         db.collection('EventsRequiringHelp')
             .onSnapshot(() => { 
                 console.log("Changes occured !")
-                this.init()
+                this.loadChanges()
             })
     }
     
@@ -52,29 +57,24 @@ class Needers extends Component {
                     </label>
                     <button onClick={() => { addIcal(this.state.ical); this.init(); }}>GO</button>
                 </div>
-                <div style={styles.upcommingCourseTitle}>Vos prochains cours : </div>
-                <div style={{display: 'inline'}}>
-                    {
-                        this.state.timetable.map( (value, index) => {
-                            return(
-                                <div onClick={() => this.setState({showContextualMenu: true, eventForContextualMenu: value})} style={upcommingCourse(index)}>
-                                    <h3>{value.title}</h3>
-                                    {value.location}
-                                    {'Du ' + value.startDay + '/' + value.startMonth+1 + '/' + value.startYear + ' à ' + value.startHours + 'h' + value.startMinutes + ' au ' + value.endDay + '/' + value.endMonth+1 + '/' + value.endYear + ' à ' + value.endHours + 'h' + value.endMinutes}
-                                </div>
-                                )
-                            })
-                    }
-                </div>
+                <UpcomingCourse 
+                    timetable={this.state.timetable}
+                    contextualMenu={(event) => this.setState({showContextualMenu: true, eventForContextualMenu: event})}
+                    />
                 {
                     this.state.showContextualMenu ? 
                         <div style={{width: 400, left: '50%', top: '50%', position: 'fixed', zIndex: 2, padding: 20, backgroundColor: '#f4f7f8', margin: 10, borderRadius: 8, fontFamily: "Georgia", transform: "translate(-50%, -50%)", shadowOffset:{  width: 20,  height: 20,  }, shadowColor: 'black', shadowOpacity: 1.0, border: '2px solid black'}}>
                             <h3>{this.state.eventForContextualMenu.title}</h3>
                             {this.state.eventForContextualMenu.location}
                             {'Du ' + this.state.eventForContextualMenu.startDay + '/' + this.state.eventForContextualMenu.startMonth+1 + '/' + this.state.eventForContextualMenu.startYear + ' à ' + this.state.eventForContextualMenu.startHours + 'h' + this.state.eventForContextualMenu.startMinutes + ' au ' + this.state.eventForContextualMenu.endDay + '/' + this.state.eventForContextualMenu.endMonth+1 + '/' + this.state.eventForContextualMenu.endYear + ' à ' + this.state.eventForContextualMenu.endHours + 'h' + this.state.eventForContextualMenu.endMinutes}
-                            <div onClick={() => requestHelp(this.state.eventForContextualMenu)} style={{color: 'blue'}}>
-                                Rechercher un preneur de note pour cette horraire
-                            </div>
+                            { 
+                                this.state.eventForContextualMenu.helper ? 
+                                    this.state.eventForContextualMenu.helper + " vous aidera sur cet événement !"
+                                    : 
+                                    <div onClick={() => requestHelp(this.state.eventForContextualMenu)} style={{color: 'blue'}}>
+                                        Rechercher un preneur de note pour cette horraire
+                                    </div>
+                            }
                         </div>
                         :
                         null
@@ -111,17 +111,16 @@ export default Needers;
 
 const colors = ["#ADBF94",  "#E1EEF3", "#E4C4D0", "#DFCAD6", "#BF94A2", "#EFE5EC", "#CC9188"]
 
-let last_color_left = -1
-let last_color_right = -1
+let last_color = -1
 
 function StyleTheyWantToHelpYou(offset){
 
     let r = -2
     do{
          r = Math.floor(Math.random()*colors.length)
-    }while(last_color_right === r)
+    }while(last_color === r)
 
-    last_color_right = r
+    last_color = r
 
     return (
         {
@@ -142,41 +141,8 @@ function StyleTheyWantToHelpYou(offset){
     )
 }
 
-function upcommingCourse(offset){
-    let r = -2
-    do{
-         r = Math.floor(Math.random()*colors.length)
-    }while(last_color_left === r)
-
-    last_color_left = r
-    
-    return (
-        {
-            position: 'absolute',
-            font: 'bold 18x Arial',
-            width: '25%',
-            height: 180,
-            left: 50,
-            top: 150+200*offset,
-            padding: 20,
-            border: '1px solid black ',
-            shadowOffset:{  width: 10,  height: 10,  },
-            shadowColor: 'black',
-            shadowOpacity: 1.0,  
-            backgroundColor: `${colors[r]}`
-        }
-    )
-}
-
 const styles = {
-    upcommingCourseTitle: {
-        position: 'absolute',
-        font: 'bold 18px Arial',
-        width: '25%',
-        left: 50,
-        top: 110,
-        marginTop: 15
-    },
+
     theyWantToHelpYouTitle: {
         position: 'absolute',
         font: 'bold 18px Arial',

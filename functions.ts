@@ -2,6 +2,8 @@ const ical = require('node-ical');
 
 import Event from './event'
 
+const colors = ["#ADBF94",  "#E1EEF3", "#E4C4D0", "#DFCAD6", "#BF94A2", "#EFE5EC", "#CC9188"]
+
 /** Load a list of event from an ICAL url */
 export async function parseICALdata(icalUrl: string){
     let events:Event[] = []
@@ -35,7 +37,7 @@ export async function parseICALdata(icalUrl: string){
         }
     )
 
-    return events
+    return addColors(events)
 }
 
 /** Prevent from showing events that already happened & sort the remaining items*/
@@ -60,4 +62,24 @@ function onlyUpcommingEvents(ev: Event[]) {
     })
 
     return eventsToReturn
+}
+
+function addColors(events: Event[]):Event[]{
+    
+    let last_color = -1
+    let r = -2
+    
+    events.forEach( (value) => {
+        do{
+            r = Math.floor(Math.random()*colors.length)
+        }while(last_color === r)
+        last_color = r
+
+        value.addColor(colors[r])
+    })
+
+    return events
+
+
+
 }

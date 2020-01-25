@@ -11,6 +11,7 @@ export default class Event {
     endDay: string
     endMonth: string
     endYear: string
+    color: string
 
     constructor(title: string, location: string, startMinutes: string, startHours: string, startDay: string, startMonth: string, startYear: string, 
                                                     endMinutes: string, endHours: string, endDay: string, endMonth: string, endYear: string){
@@ -26,5 +27,9 @@ export default class Event {
         this.endYear=endYear
         this.endMinutes = endMinutes
         this.endHours = endHours
+    }
+
+    addColor(color:string) {
+        this.color = color
     }
 }
