@@ -47,6 +47,22 @@ app.post('/api/getIcalData', async function(req: { body: { ical: string; }; }, r
     }
     else {
         let events:Event[] = await parseICALdata(req.body.ical)
+
+        await new Promise( (resolve, reject) => {
+            EventsRequiringHelp.get().then( snapshot => {
+                snapshot.forEach(doc => {
+                    if(doc.data().helper){
+                        events.forEach( (value) => {
+                            if(value.equals(doc.data())){
+                                value.addHelper(doc.data().helper)
+                            }
+                        })
+                    }
+                });
+            })
+            .then( () => resolve())
+        })
+
         if(events.length > 0){
             console.log("ICAL data successfully fetched")
             res.json({
@@ -160,16 +176,13 @@ app.get('/event', async function(req, res) {
             EventsRequiringHelp.doc(req.query.event).update({
                 potentHelper: admin.firestore.FieldValue.delete()
             })
-            
+
             // set new field helper to value email
             EventsRequiringHelp.doc(req.query.event).update({
                 helper: req.query.helper
             })
 
-            res.json({
-                status: "success",
-                message: req.query.event
-            })
+            res.redirect('/')
         }
     }
     else {

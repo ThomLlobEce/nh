@@ -1,9 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios'
 import MouseOverButton from './MouseOverButton'
-import * as firebase from "firebase/app";
-import "firebase/auth";
-import "firebase/firestore";
 import { createUser } from '../Middleware/firebase'
 
 /** Form used for signing users up */

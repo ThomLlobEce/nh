@@ -62,7 +62,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'Client/build')));
 app.post('/api/getIcalData', function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
-        var events;
+        var events_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -74,15 +74,31 @@ app.post('/api/getIcalData', function (req, res) {
                         status: "failed",
                         message: "Missing parameters"
                     });
-                    return [3 /*break*/, 3];
+                    return [3 /*break*/, 4];
                 case 1: return [4 /*yield*/, functions_1.parseICALdata(req.body.ical)];
                 case 2:
-                    events = _a.sent();
-                    if (events.length > 0) {
+                    events_1 = _a.sent();
+                    return [4 /*yield*/, new Promise(function (resolve, reject) {
+                            EventsRequiringHelp.get().then(function (snapshot) {
+                                snapshot.forEach(function (doc) {
+                                    if (doc.data().helper) {
+                                        events_1.forEach(function (value) {
+                                            if (value.equals(doc.data())) {
+                                                value.addHelper(doc.data().helper);
+                                            }
+                                        });
+                                    }
+                                });
+                            })
+                                .then(function () { return resolve(); });
+                        })];
+                case 3:
+                    _a.sent();
+                    if (events_1.length > 0) {
                         console.log("ICAL data successfully fetched");
                         res.json({
                             status: "success",
-                            message: events
+                            message: events_1
                         });
                     }
                     else {
@@ -92,8 +108,8 @@ app.post('/api/getIcalData', function (req, res) {
                             message: "Return empty set, url specified may not work"
                         });
                     }
-                    _a.label = 3;
-                case 3: return [2 /*return*/];
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
             }
         });
     });
@@ -206,10 +222,7 @@ app.get('/event', function (req, res) {
                         EventsRequiringHelp.doc(req.query.event).update({
                             helper: req.query.helper
                         });
-                        res.json({
-                            status: "success",
-                            message: req.query.event
-                        });
+                        res.redirect('/');
                     }
                     return [3 /*break*/, 4];
                 case 3:

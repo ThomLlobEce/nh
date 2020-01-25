@@ -157,7 +157,7 @@ export async function addIcal(ical) {
         
     let email = (await getUser()).email
 
-    if(email != ""){
+    if(email !== ""){
         return await new Promise( (resolve, reject) => {
             db.collection("Users").doc(email).update({
                 ical: ical
@@ -182,14 +182,14 @@ export async function requestHelp(event){
 
     let email = (await getUser()).email
 
-    if(email != ""){
+    if(email !== ""){
         return await new Promise( (resolve, reject) => {
             db.collection("EventsRequiringHelp").doc().set({
                 location: event.location,
                 requester: email,
                 title: event.title,
                 start: firebase.firestore.Timestamp.fromDate(new Date(months[parseInt(event.startMonth)] + ' ' + event.startDay + ', ' + event.startYear + ' ' + event.startHours + ':' + event.startMinutes + ':00')),
-                end: firebase.firestore.Timestamp.fromDate(new Date(months[parseInt(event.startMonth)] + ' ' + event.startDay + ', ' + event.startYear + ' ' + event.startHours + ':' + event.startMinutes + ':00'))
+                end: firebase.firestore.Timestamp.fromDate(new Date(months[parseInt(event.endMonth)] + ' ' + event.endDay + ', ' + event.endYear + ' ' + event.endHours + ':' + event.endMinutes + ':00'))
             })
             .then(function() {
                 console.log("Document successfully written!");
@@ -209,12 +209,12 @@ export async function requestHelp(event){
 export async function getUpcomingEventsLookingForHelpers(){
     let email = (await getUser()).email
 
-    if(email != ""){
+    if(email !== ""){
         return await new Promise( (resolve, reject) => {
             let upcomingEvent = []
             db.collection("EventsRequiringHelp").orderBy("start").get().then( function(querySnapshot) {
                 querySnapshot.forEach(function(doc) {
-                    if(!doc.data().helper)
+                    if(!doc.data().helper && ( !doc.data().potentHelper || !doc.data().potentHelper.include(email)))
                         upcomingEvent.push({...doc.data(), id: doc.id})
                     })                
                     resolve(upcomingEvent)
@@ -235,7 +235,7 @@ export async function getNeedStatus(){
 
     console.log(user)
 
-    if(user.email != ""){
+    if(user.email !== ""){
         return await new Promise( (resolve, reject) => {
             db.collection("Users").get().then( function(querySnapshot) {
                 querySnapshot.forEach(function(doc) {
@@ -258,7 +258,7 @@ export async function getNeedStatus(){
 
 export async function addPotentHelper(user, ev){
     let id = await getEventsRequiringHelpId(ev)
-    if(id != -1){
+    if(id !== -1){
         return await new Promise( (resolve, reject) => {
             db.collection("EventsRequiringHelp").doc(id).set({
                 potentHelper: [user.email]
@@ -310,7 +310,7 @@ export async function getTheyWantToHelpYou(){
 
     let email = (await getUser()).email
 
-    if(email != ""){
+    if(email !== ""){
         return await new Promise( (resolve, reject) => {
             let theyWantToHelpYou = []
             db.collection("EventsRequiringHelp").get().then( function(querySnapshot) {
