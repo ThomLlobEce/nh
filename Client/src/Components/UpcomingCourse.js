@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { getIcalData, addIcal, requestHelp, getTheyWantToHelpYou, validateHelper, db} from '../Middleware/firebase'
 
-// Components for / url showing the upcomming course for the needers-only content
+// Components for / url showing the Upcoming course for the needers-only content
 export default class UpcomingCourse extends Component {
 
     render()
@@ -9,12 +9,12 @@ export default class UpcomingCourse extends Component {
         return(
             <div>
                 
-                <div style={styles.upcommingCourseTitle}>Vos prochains cours : </div>
+                <div style={styles.upcomingCourseTitle}>Vos prochains cours : </div>
                 <div style={{display: 'inline'}}>
                     {
                         this.props.timetable.map( (value, index) => {
                             return(
-                                <div onClick={() => this.props.contextualMenu(value)} style={upcomingCourse(index, value.color)}>
+                                <div onClick={() => this.props.contextualMenu(value)} style={UpcomingCourse(index, value.color)}>
                                     <h3>{value.title}</h3>
                                     {value.location}
                                     {'Du ' + value.startDay + '/' + value.startMonth+1 + '/' + value.startYear + ' à ' + value.startHours + 'h' + value.startMinutes + ' au ' + value.endDay + '/' + value.endMonth+1 + '/' + value.endYear + ' à ' + value.endHours + 'h' + value.endMinutes}
@@ -29,7 +29,7 @@ export default class UpcomingCourse extends Component {
     }
 }
 
-function upcomingCourse(offset, color){
+function UpcomingCourse(offset, color){
     return (
         {
             position: 'absolute',
@@ -49,7 +49,7 @@ function upcomingCourse(offset, color){
 }
 
 const styles = {
-    upcommingCourseTitle: {
+    upcomingCourseTitle: {
         position: 'absolute',
         font: 'bold 18px Arial',
         width: '25%',

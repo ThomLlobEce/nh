@@ -66,7 +66,7 @@ function parseICALdata(icalUrl) {
                                 resolve(eventsTab);
                             });
                         }).then(function (eventsTab) {
-                            var eventsToReturn = onlyUpcommingEvents(eventsTab);
+                            var eventsToReturn = onlyUpcomingEvents(eventsTab);
                             return eventsToReturn;
                         })];
                 case 1:
@@ -78,7 +78,7 @@ function parseICALdata(icalUrl) {
 }
 exports.parseICALdata = parseICALdata;
 /** Prevent from showing events that already happened & sort the remaining items*/
-function onlyUpcommingEvents(ev) {
+function onlyUpcomingEvents(ev) {
     var date;
     var eventsToReturn = [];
     var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];

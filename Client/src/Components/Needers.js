@@ -10,9 +10,9 @@ class Needers extends Component {
 
         this.state = {
             ical: '', // Contains the ical value of the ical form
-            timetable: [], // Contains the upcomming events
+            timetable: [], // Contains theupcoming events
             showContextualMenu: false, // Wether the contextual menu should be print or not
-            eventForContextualMenu: null, // Contains the specific upcomming event to show in the contextual menu
+            eventForContextualMenu: null, // Contains the specific upcoming event to show in the contextual menu
             theyWantToHelpYou: [], // Contains every request of help concerning the current user,
             init: false
         }

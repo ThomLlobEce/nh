@@ -6,7 +6,7 @@ export default class User {
     public year: number // 
     public cm: string // 
     public password: string // contains the password -- UNSECURED
-    public ical: string // contains the url of an ical source for loading upcomming events
+    public ical: string // contains the url of an ical source for loading Upcoming events
     public need: Boolean // true = Person looking for help, false = Person looking for helping
 
     constructor(name: string, firstName: string, email: string, ufr: string, year: number, cm: string, password: string, need: Boolean) {

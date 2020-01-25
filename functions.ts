@@ -31,7 +31,7 @@ export async function parseICALdata(icalUrl: string){
             
         }).then( (eventsTab:Event[]):Event[] => {
             
-            let eventsToReturn:Event[] = onlyUpcommingEvents(eventsTab)
+            let eventsToReturn:Event[] = onlyUpcomingEvents(eventsTab)
 
             return eventsToReturn
         }
@@ -41,7 +41,7 @@ export async function parseICALdata(icalUrl: string){
 }
 
 /** Prevent from showing events that already happened & sort the remaining items*/
-function onlyUpcommingEvents(ev: Event[]) {
+function onlyUpcomingEvents(ev: Event[]) {
     let date:string
     let eventsToReturn:Event[] = []
     let months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -68,7 +68,7 @@ function addColors(events: Event[]):Event[]{
     
     let last_color = -1
     let r = -2
-    
+
     events.forEach( (value) => {
         do{
             r = Math.floor(Math.random()*colors.length)

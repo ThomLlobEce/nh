@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getUpcommingEventsLookingForHelpers } from '../Middleware/firebase'
+import { getUpcomingEventsLookingForHelpers } from '../Middleware/firebase'
 import MouseOverButton from './MouseOverButton';
 import { submit, db} from '../Middleware/firebase'
 
@@ -10,10 +10,10 @@ class Helpers extends Component {
         super(props)
 
         this.state = {
-            upcommingEventsLookingForHelpers: [] // Contains the upcoming events looking for helpers for the need=false users
+            upcomingEventsLookingForHelpers: [] // Contains the upcoming events looking for helpers for the need=false users
         }
 
-        this.getUpcommingEventsLookingForHelpers() // Getting upcomming events from server
+        this.getUpcomingEventsLookingForHelpers() // Getting upcoming events from server
         this.listen()
     }
 
@@ -21,14 +21,14 @@ class Helpers extends Component {
         db.collection('EventsRequiringHelp')
             .onSnapshot(() => { 
                 console.log("Changes occured !")
-                this.getUpcommingEventsLookingForHelpers()
+                this.getUpcomingEventsLookingForHelpers()
             })
     }
     
 
-    /** Method for loading from server the upcomming events looking for helpers */
-    getUpcommingEventsLookingForHelpers = async () => {
-        this.setState({upcommingEventsLookingForHelpers: await getUpcommingEventsLookingForHelpers()})
+    /** Method for loading from server the upcoming events looking for helpers */
+    getUpcomingEventsLookingForHelpers = async () => {
+        this.setState({upcomingEventsLookingForHelpers: await getUpcomingEventsLookingForHelpers()})
         
     }
 
@@ -37,9 +37,9 @@ class Helpers extends Component {
         return(
             <div>
                 
-                {console.log(this.state.upcommingEventsLookingForHelpers)}
+                {console.log(this.state.upcomingEventsLookingForHelpers)}
             {
-                this.state.upcommingEventsLookingForHelpers.map( (value) => {
+                this.state.upcomingEventsLookingForHelpers.map( (value) => {
                     return(
                         <div>
                             <h3>Prénom du requêtant {value.requester}</h3>

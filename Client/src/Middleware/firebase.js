@@ -206,18 +206,18 @@ export async function requestHelp(event){
     }
 }
 
-export async function getUpcommingEventsLookingForHelpers(){
+export async function getUpcomingEventsLookingForHelpers(){
     let email = (await getUser()).email
 
     if(email != ""){
         return await new Promise( (resolve, reject) => {
-            let upcommingEvent = []
+            let upcomingEvent = []
             db.collection("EventsRequiringHelp").orderBy("start").get().then( function(querySnapshot) {
                 querySnapshot.forEach(function(doc) {
                     if(!doc.data().helper)
-                        upcommingEvent.push({...doc.data(), id: doc.id})
+                        upcomingEvent.push({...doc.data(), id: doc.id})
                     })                
-                    resolve(upcommingEvent)
+                    resolve(upcomingEvent)
             })
             .catch(function(error) {
                 console.error("Error writing document: ", error);
