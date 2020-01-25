@@ -15,6 +15,7 @@ export default class Event {
     endYear: string
     color: string
     helper: string
+    helperFirstName: string
 
     constructor(title: string, location: string, startMinutes: string, startHours: string, startDay: string, startMonth: string, startYear: string, 
                                                     endMinutes: string, endHours: string, endDay: string, endMonth: string, endYear: string){
@@ -36,8 +37,9 @@ export default class Event {
         this.color = color
     }
 
-    addHelper(name:string){
-        this.helper=name
+    addHelper(email:string, firstName:string){
+        this.helper=email
+        this.helperFirstName=firstName
     }
 
     equals(object):boolean{

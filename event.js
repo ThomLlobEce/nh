@@ -19,8 +19,9 @@ var Event = /** @class */ (function () {
     Event.prototype.addColor = function (color) {
         this.color = color;
     };
-    Event.prototype.addHelper = function (name) {
-        this.helper = name;
+    Event.prototype.addHelper = function (email, firstName) {
+        this.helper = email;
+        this.helperFirstName = firstName;
     };
     Event.prototype.equals = function (object) {
         if (object.title === this.title && object.location === this.location) {

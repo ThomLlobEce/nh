@@ -54,7 +54,7 @@ app.post('/api/getIcalData', async function(req: { body: { ical: string; }; }, r
                     if(doc.data().helper){
                         events.forEach( (value) => {
                             if(value.equals(doc.data())){
-                                value.addHelper(doc.data().helper)
+                                value.addHelper(doc.data().helper, doc.data().helperFirstName)
                             }
                         })
                     }
@@ -154,12 +154,13 @@ app.get('/event', async function(req, res) {
             Users.doc(req.query.helper).get().then( doc => {
                 if(doc.exists){
                     if(doc.data().need === false){
-                        resolve(true)
+                        resolve(doc.data().firstName)
                     } else {
                         res.json({
                             status: 'failed',
                             message: 'This user is not an helper'
                         })
+                        resolve(null)
                     }
                 } else {
                     res.json({
@@ -179,7 +180,8 @@ app.get('/event', async function(req, res) {
 
             // set new field helper to value email
             EventsRequiringHelp.doc(req.query.event).update({
-                helper: req.query.helper
+                helper: req.query.helper,
+                helperFirstName: helper
             })
 
             res.redirect('/')

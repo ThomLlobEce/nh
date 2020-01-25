@@ -8,9 +8,18 @@ export default class TheyWantToHelpYou extends Component {
     {
         return(
             <div>
-                <div style={styles.theyWantToHelpYouTitle}>Ils veulent vous aider : </div>
-                <div style={styles.theyWantToHelpYou}>
-                    <div style={{display: 'inline'}}>
+                <div style={styles.theyWantToHelpYouTitle}>Ils veulent vous aider</div>
+                <div style={{display: 'inline'}}>
+                    <div
+                            style={{
+                                position: "absolute",
+                                top: 120,
+                                right: 50,
+                                height: "85%",
+                                width: "20%",
+                                overflowY: "scroll"
+                            }}
+                        >
                     {
                         this.props.theyWantToHelpYou.map( (value, index) => {
                             return(
@@ -35,19 +44,15 @@ export default class TheyWantToHelpYou extends Component {
     }
 }
 
-function StyleTheyWantToHelpYou(offset, color){
+function StyleTheyWantToHelpYou(color){
 
     return (
         {
-            position: 'absolute',
-            font: 'bold 18px Arial',
-            width: '25%',
-            right: 50,
+            font: '14px Arial',
             height: 180,
-            top: 150+250*offset,
             marginTop: 5,
             padding: 20,
-            border: '1px solid black ',
+            border: '1px solid #CCCCCC ',
             shadowOffset:{  width: 10,  height: 10,  },
             shadowColor: 'black',
             shadowOpacity: 1.0,  
@@ -60,10 +65,13 @@ const styles = {
 
     theyWantToHelpYouTitle: {
         position: 'absolute',
+        color: "#515459",
         font: 'bold 18px Arial',
-        width: '25%',
+        width: '20%',
         right: 50,
-        top: 110,
-        marginTop: 15
+        top: 70,
+        marginTop: 15,
+        paddingBottom: 3,
+        borderBottom: '1px solid black'
     }
 }

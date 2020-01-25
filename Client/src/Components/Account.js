@@ -3,7 +3,6 @@ import NavBar from './NavBar'
 import { Redirect } from 'react-router-dom';
 import Needers from './Needers';
 import Helpers from './Helpers';
-import User from './User'
 import { isAuth, getNeedStatus } from '../Middleware/firebase'
 
 // Components for / url
@@ -43,7 +42,6 @@ export default class Account extends Component {
                             this.state.logged ? 
                                 /** User is allowed to access the content of this page */
                                 <div>
-                                    <User user = {this.props.user} />
                                     <div>
                                         <NavBar logged={true} disconnect={this.props.disconnect} />
                                         { /** Common to every users */}

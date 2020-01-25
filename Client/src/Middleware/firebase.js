@@ -1,6 +1,7 @@
 import * as firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import 'firebase/storage'
 import axios from 'axios'
 
 var firebaseConfig = {
@@ -19,7 +20,7 @@ firebase.initializeApp(firebaseConfig);
 
 export const db = firebase.firestore()
 
-async function getUser(){
+export async function getUser(){
     let email = await new Promise( (resolve, reject) => { 
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
@@ -374,4 +375,18 @@ export async function validateHelper(helper, event){
         })
         .catch(error => { console.log(error);})
     }
+}
+
+export async function uploadProfilePic(file){
+    console.log(file)
+    firebase.storage().ref().put(file.name).then(snapshot => {
+        console.log('Uploaded.');
+    })
+    .catch(error => console.log(error))
+      
+    console.log("upload suceed")
+}
+
+export async function downloadProfilePic(path){
+    //return await firebase.storage().ref('images').child(path).getDownloadURL().then(url => {return url})
 }

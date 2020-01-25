@@ -84,7 +84,7 @@ app.post('/api/getIcalData', function (req, res) {
                                     if (doc.data().helper) {
                                         events_1.forEach(function (value) {
                                             if (value.equals(doc.data())) {
-                                                value.addHelper(doc.data().helper);
+                                                value.addHelper(doc.data().helper, doc.data().helperFirstName);
                                             }
                                         });
                                     }
@@ -193,13 +193,14 @@ app.get('/event', function (req, res) {
                             Users.doc(req.query.helper).get().then(function (doc) {
                                 if (doc.exists) {
                                     if (doc.data().need === false) {
-                                        resolve(true);
+                                        resolve(doc.data().firstName);
                                     }
                                     else {
                                         res.json({
                                             status: 'failed',
                                             message: 'This user is not an helper'
                                         });
+                                        resolve(null);
                                     }
                                 }
                                 else {
@@ -220,7 +221,8 @@ app.get('/event', function (req, res) {
                         });
                         // set new field helper to value email
                         EventsRequiringHelp.doc(req.query.event).update({
-                            helper: req.query.helper
+                            helper: req.query.helper,
+                            helperFirstName: helper
                         });
                         res.redirect('/');
                     }
