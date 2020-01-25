@@ -41,6 +41,7 @@ var path = require('path');
 var app = express();
 var bodyParser = require('body-parser');
 var nodemailer = require('nodemailer');
+var admin = require('firebase-admin');
 var functions_1 = require("./functions");
 var transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -49,7 +50,13 @@ var transporter = nodemailer.createTransport({
         pass: 'AzertyuioP'
     }
 });
-// https://planning-paris.inseecu.net/Telechargements/ical/Edt_LLOBREGAT.ics?version=2019.0.4.0&idICal=ED8C99CB6BE8F57EC536877E01FC1D6F&param=643d5b312e2e36325d2666683d3126663d31
+var serviceAccount = require('./serviceAccountKey.json');
+// Initialize Firebase
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+var Users = admin.firestore().collection("Users");
+var EventsRequiringHelp = admin.firestore().collection("EventsRequiringHelp");
 app.use(bodyParser.json());
 // Serve the static files from the React app
 app.use(express.static(path.join(__dirname, 'Client/build')));
@@ -59,7 +66,7 @@ app.post('/api/getIcalData', function (req, res) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    console.log("*** API REQUEST (GET) : /api/getIcalData ***");
+                    console.log("*** API REQUEST (POST) : /api/getIcalData ***");
                     console.log("Parameters given : " + JSON.stringify(req.body));
                     if (!!req.body.ical) return [3 /*break*/, 1];
                     console.log("ERROR : Not enough parameters given. Check readme.md to have more informations.");
@@ -72,7 +79,7 @@ app.post('/api/getIcalData', function (req, res) {
                 case 2:
                     events = _a.sent();
                     if (events.length > 0) {
-                        console.log("Data successfully fetched");
+                        console.log("ICAL data successfully fetched");
                         res.json({
                             status: "success",
                             message: events
@@ -92,14 +99,19 @@ app.post('/api/getIcalData', function (req, res) {
     });
 });
 app.post('/api/sendEmail', function (req, res) {
-    console.log("*** API REQUEST (GET) : /api/getIcalData ***");
+    console.log("*** API REQUEST (POST) : /api/sendEmail ***");
     console.log("Parameters given : " + JSON.stringify(req.body));
-    if (req.body.to && req.body.subject && req.body.text) {
+    if (req.body.to && req.body.subject && req.body.email && req.body.event) {
         var mailOptions = {
             from: 'nanterreHang@gmail.com',
             to: req.body.to,
             subject: req.body.subject,
-            html: req.body.text
+            html: ("<b>" + req.body.email + " souhaite vous aider pour l'évenement suivant :</b>"
+                + "<p> Nom de l'événement : " + req.body.event.title + '\n'
+                + "Date de l'événement : " + '\n'
+                + "Lieu de l'événement : " + req.body.event.location + '\n'
+                + "Si vous souhaitez participer à cette événement, cliquez sur le lien suivant : "
+                + "<a href=\"http://localhost:5000/event?event=" + req.body.event.id + "&helper=" + req.body.email + "\">http://localhost:5000/event?event=" + req.body.event.id + "&helper=" + req.body.email + "</a></p>")
         };
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
@@ -124,6 +136,92 @@ app.post('/api/sendEmail', function (req, res) {
             message: 'Not enough parameters given'
         });
     }
+});
+app.get('/event', function (req, res) {
+    return __awaiter(this, void 0, void 0, function () {
+        var del, helper;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    console.log("*** API REQUEST (GET) : /event ***");
+                    console.log("Parameters given : " + JSON.stringify(req.query));
+                    if (!(req.query.event && req.query.helper)) return [3 /*break*/, 3];
+                    return [4 /*yield*/, new Promise(function (resolve, reject) {
+                            EventsRequiringHelp.doc(req.query.event).get().then(function (doc) {
+                                if (doc.exists) {
+                                    if (doc.data().potentHelper.includes(req.query.helper)) {
+                                        resolve(true);
+                                    }
+                                    else {
+                                        res.json({
+                                            status: "failed",
+                                            message: "The helper is not in the potent list"
+                                        });
+                                        resolve(false);
+                                    }
+                                }
+                                else {
+                                    res.json({
+                                        status: "failed",
+                                        message: "This event does not exist"
+                                    });
+                                    resolve(false);
+                                }
+                            });
+                        })
+                        // Get the helper
+                    ];
+                case 1:
+                    del = _a.sent();
+                    return [4 /*yield*/, new Promise(function (resolve, reject) {
+                            Users.doc(req.query.helper).get().then(function (doc) {
+                                if (doc.exists) {
+                                    if (doc.data().need === false) {
+                                        resolve(true);
+                                    }
+                                    else {
+                                        res.json({
+                                            status: 'failed',
+                                            message: 'This user is not an helper'
+                                        });
+                                    }
+                                }
+                                else {
+                                    res.json({
+                                        status: 'failed',
+                                        message: 'This user does not exist'
+                                    });
+                                    resolve(null);
+                                }
+                            });
+                        })];
+                case 2:
+                    helper = _a.sent();
+                    if (del && helper) {
+                        // Delete potent helpers
+                        EventsRequiringHelp.doc(req.query.event).update({
+                            potentHelper: admin.firestore.FieldValue["delete"]()
+                        });
+                        // set new field helper to value email
+                        EventsRequiringHelp.doc(req.query.event).update({
+                            helper: req.query.helper
+                        });
+                        res.json({
+                            status: "success",
+                            message: req.query.event
+                        });
+                    }
+                    return [3 /*break*/, 4];
+                case 3:
+                    res.json({
+                        status: 'failed',
+                        message: 'Not enough parameters given'
+                    });
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
 });
 // Handles any requests that don't match the ones above
 app.get('*', function (req, res) {

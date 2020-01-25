@@ -91,7 +91,7 @@ class Needers extends Component {
                                     {
                                         value.potentHelper.map( (val, index) => {
                                             return (
-                                                <div onClick = {() => {validateHelper(val.email, value) }}>{val.email}</div>
+                                                <div onClick = {() => {validateHelper(val, value) }}>{val}</div>
                                             )
                                         })
                                     }                                    

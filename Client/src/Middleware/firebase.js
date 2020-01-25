@@ -215,7 +215,7 @@ export async function getUpcommingEventsLookingForHelpers(){
             db.collection("EventsRequiringHelp").orderBy("start").get().then( function(querySnapshot) {
                 querySnapshot.forEach(function(doc) {
                     if(!doc.data().helper)
-                        upcommingEvent.push(doc.data())
+                        upcommingEvent.push({...doc.data(), id: doc.id})
                     })                
                     resolve(upcommingEvent)
             })
@@ -261,7 +261,7 @@ export async function addPotentHelper(user, ev){
     if(id != -1){
         return await new Promise( (resolve, reject) => {
             db.collection("EventsRequiringHelp").doc(id).set({
-                potentHelper: [user]
+                potentHelper: [user.email]
             }, { merge: true })
             .then(function() {
                 console.log("Document successfully written!");
@@ -289,12 +289,8 @@ export async function submit(event){
             {
                 to: event.requester,
                 subject: "Quelqu'un veut vous aider sur un événement !",
-                text: "<b>" + (await getUser()).email + " souhaite vous aider pour l'évenement suivant :</b>"
-                    + "<p> Nom de l'événement : " + event.title + '\n'
-                    + "Date de l'événement : " + '\n'
-                    + "Lieu de l'événement : " + event.location + '\n'
-                    + "Si vous souhaitez participer à cette événement, cliquez sur le lien suivant : "
-                    + "<a href=\"http://localhost:5000\">http://localhost:5000</a></p>"
+                email: (await getUser()).email,
+                event: event
             },
             { headers: { 'Content-Type': 'application/json' } }
         )
@@ -320,7 +316,7 @@ export async function getTheyWantToHelpYou(){
             db.collection("EventsRequiringHelp").get().then( function(querySnapshot) {
                 querySnapshot.forEach(function(doc) {
                     if(doc.data().requester === email && doc.data().potentHelper){
-                        theyWantToHelpYou.push(doc.data())
+                        theyWantToHelpYou.push({...doc.data(), id: doc.id})
                     }                   
                 })
                 console.log("theyWantToHelpYou successfully fetched : " + JSON.stringify(theyWantToHelpYou))
@@ -362,43 +358,20 @@ async function getEventsRequiringHelpId(ev){
 
 export async function validateHelper(helper, event){
 
-    let del = false
+    let user = await getUser()
 
-    let id = await new Promise( async (resolve, reject) => {
-        let id = await getEventsRequiringHelpId(event)
-
-        db.collection("EventsRequiringHelp").get().then(function(querySnapshot) {
-            querySnapshot.forEach(function(doc) {
-                if(doc.id === id){
-                    // verify that email is in field potentHelper
-                    doc.data().potentHelper.forEach( (value) => {
-                        if(value.email === helper){
-                            del = true
-                            resolve(id)
-                        }
-                    })
-                }
-            })
-            resolve(-1)
+    if(user){
+        axios.get(
+            '/event?event='+event.id+"&helper="+helper,
+        )
+        .then( (res) => {
+            if(res.data.status === 'success'){
+                console.log("Helper correctly assigned to event")
+            }
+            else{
+                console.log(res.data.message)
+            }
         })
-        .catch(function(error) {
-            console.error("Error writing document: ", error);
-            resolve(-1)
-        });
-    })
-
-    if(del && id != -1){
-        // delete field potentHelper
-        await new Promise( async (resolve, reject) => {
-            db.collection('EventsRequiringHelp').doc(id).update({
-                potentHelper: firebase.firestore.FieldValue.delete()
-            });
-            resolve()
-        })
-        
-        // set new field helper to value email
-        db.collection("EventsRequiringHelp").doc(id).update({
-            helper: helper
-        })
+        .catch(error => { console.log(error);})
     }
 }
