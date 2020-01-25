@@ -22,17 +22,21 @@ export default class TheyWantToHelpYou extends Component {
                         >
                     {
                         this.props.theyWantToHelpYou.map( (value, index) => {
+                            let start = new Date(value.start.seconds*1000)
+                            let end = new Date(value.end.seconds*1000)
                             return(
-                                <div style={StyleTheyWantToHelpYou(index, "#FFFFFF")}>
+                                <div style={StyleTheyWantToHelpYou(value.color)}>
                                     <h3>{value.title}</h3>
-                                    {value.location}
+                                    <div>{value.location}</div>
+                                    <div>{'Du ' + start.getDay() + '/' + start.getMonth()+1 + '/' + start.getFullYear() + ' à ' + start.getHours() + 'h' + start.getMinutes() + ' au ' + end.getDay() + '/' + end.getMonth()+1 + '/' + end.getFullYear() + ' à ' + end.getHours() + 'h' + end.getMinutes() }</div>
+                                    <div>Ils souhaitent vous aider : </div>
                                     {
                                         value.potentHelper.map( (val, index) => {
                                             return (
                                                 <div onClick = {() => {validateHelper(val, value) }}>{val}</div>
                                             )
                                         })
-                                    }                                    
+                                    }
                                 </div>
                                 )
                             })   

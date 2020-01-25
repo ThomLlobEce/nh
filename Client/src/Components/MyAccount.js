@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getUser, uploadProfilePic , downloadProfilePic} from '../Middleware/firebase'
+import { getUser, uploadProfilePic , downloadProfilePic, toggleAllowEmail, getAllowEmail} from '../Middleware/firebase'
 import addUser from '../Images/user_add.png'
 
 // Components for showing / editing the users informations
@@ -10,25 +10,14 @@ export default class MyAccount extends Component {
 
         this.state = {
             user: {},
-            image: null
+            allowEmail: false
         }
 
         this.init()
     }
 
     init = async () => {
-        this.setState({user: await getUser()})
-    }
-
-    handleChange = e => {
-        if (e.target.files[0]) {
-          this.setState({image: e.target.files[0]});
-        }
-    }
-
-    handleUpload = () => {
-        uploadProfilePic(this.state.image)
-        //this.setState({url: await downloadProfilePic(this.state.image.name)})
+        this.setState({user: await getUser(), url: await downloadProfilePic(), allowEmail: await getAllowEmail()})
     }
 
     render()
@@ -38,15 +27,18 @@ export default class MyAccount extends Component {
                 <div style={styles.myAccountTitle}>Mon compte</div>
                 <div style={{display: "flex", position: "absolute", width: "100%", height: "100%"}}>
                     <div style={styles.photo}>
-                        <img src={this.state.url || addUser} alt="Image de profil"/>
-                        {
-                            this.state.url ? null : (<div><input type="file" accept="image/png, image/jpeg" onChange={this.handleChange}></input><button onClick={this.handleUpload}>Upload</button></div>)
-                        }
+                            <label for="file-input">
+                                <img src={this.state.url || addUser} style={{width: "100%", height: "100%"}}/>
+                            </label>
+                            <input id="file-input" type="file" accept="image/png, image/jpeg" onChange={async (e) => {if(await uploadProfilePic(e.target.files)){ this.setState({url: await downloadProfilePic()})}}} style={{display: "none"}}/>
                     </div>
                     <div style={styles.nom}>
                         <h3>{this.state.user.firstName + " " + this.state.user.name}</h3>
                         <div>E-mail : {this.state.user.email}</div>
                         <div>Promotion : {this.state.user.year}</div>
+                        <br />
+                        <br />
+                        <div>Autoriser l'envoi d'e-mail : <input type="checkbox" checked={this.state.allowEmail} onChange={async () => { await toggleAllowEmail(); this.setState({allowEmail: await getAllowEmail()})}}/></div>
                     </div>
                 </div>
             </div>
@@ -81,7 +73,8 @@ const styles = {
     photo: {
         margin: "3%",
         border: "1px solid #CCCCCC",
-        height: "64%"
+        height: "64%",
+        aspectRatio: 1
     },
     nom: {
         textAlign: "left"

@@ -14,11 +14,44 @@ var firebaseConfig = {
     appId: "1:780291436881:web:8bed0ae9a8994d51012370"
 };
 
+let last_color = -2
+const colors = ["#ADBF94",  "#E1EEF3", "#E4C4D0", "#DFCAD6", "#BF94A2", "#EFE5EC", "#CC9188"]
+
+
+function generateRandomCOlor(){
+    let r = -1
+    do{
+        r = Math.floor(Math.random()*colors.length)
+    }while(r === last_color)
+
+    last_color = r
+
+    return colors[r]
+}
+
   
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
 export const db = firebase.firestore()
+
+export async function getUserByEmail(email){
+    if(email){
+        return await new Promise( (resolve, reject) => {
+            db.collection("Users").get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        if(doc.id === email){
+                            resolve({...doc.data(), email: email})
+                        }
+                    });
+            })
+            .catch( (error) => {console.log(error); resolve({})})
+        })
+    } else {
+        return {}
+    }
+}
 
 export async function getUser(){
     let email = await new Promise( (resolve, reject) => { 
@@ -284,7 +317,7 @@ export async function submit(event){
 
     let ok = await addPotentHelper(user, event)
 
-    if(ok){
+    if(ok && await getAllowEmail(event.requester)){
         axios.post(
             '/api/sendEmail',
             {
@@ -317,7 +350,7 @@ export async function getTheyWantToHelpYou(){
             db.collection("EventsRequiringHelp").get().then( function(querySnapshot) {
                 querySnapshot.forEach(function(doc) {
                     if(doc.data().requester === email && doc.data().potentHelper){
-                        theyWantToHelpYou.push({...doc.data(), id: doc.id})
+                        theyWantToHelpYou.push({...doc.data(), id: doc.id, color: generateRandomCOlor()})
                     }                   
                 })
                 console.log("theyWantToHelpYou successfully fetched : " + JSON.stringify(theyWantToHelpYou))
@@ -378,15 +411,47 @@ export async function validateHelper(helper, event){
 }
 
 export async function uploadProfilePic(file){
-    console.log(file)
-    firebase.storage().ref().put(file.name).then(snapshot => {
-        console.log('Uploaded.');
+    return new Promise( async (resolve, reject) => {
+        firebase.storage().ref((await getUser()).email).put(file[0]).then(snapshot => {
+            console.log('Uploaded.');
+            resolve(true)
+        })
+        .catch(error => {console.log(error); resolve(false)})
     })
-    .catch(error => console.log(error))
-      
-    console.log("upload suceed")
 }
 
-export async function downloadProfilePic(path){
-    //return await firebase.storage().ref('images').child(path).getDownloadURL().then(url => {return url})
+export async function downloadProfilePic(){
+    return new Promise( async (resolve, reject) => {
+        firebase.storage().ref().child((await getUser()).email).getDownloadURL().then( url => {
+            resolve(url)
+        })
+    })
+}
+
+export async function getAllowEmail(email){
+    if(email){
+        return (await getUserByEmail(email)).allowEmail
+    } else {
+        return (await getUser()).allowEmail
+    }
+    
+}
+
+export async function toggleAllowEmail(){
+    let email = (await getUser()).email
+
+    if(email){
+        db.collection("Users").doc(email).update({
+            allowEmail: !(await getAllowEmail())
+        })
+        .then(function() {
+            console.log("Document successfully written!");
+        })
+        .catch(function(error) {
+            console.error("Error writing document: ", error);
+        });   
+    }
+    else{
+        console.log("No user logged.")
+    }
 }

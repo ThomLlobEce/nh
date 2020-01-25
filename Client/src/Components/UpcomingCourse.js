@@ -15,7 +15,7 @@ export default class UpcomingCourse extends Component {
                                 position: "absolute",
                                 top: 120,
                                 left: 50,
-                                height: "85%",
+                                height: "75%",
                                 width: "20%",
                                 overflowY: "scroll"
                             }}
