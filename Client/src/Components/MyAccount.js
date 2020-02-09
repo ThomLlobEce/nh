@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getUser, uploadProfilePic , downloadProfilePic, toggleAllowEmail, getAllowEmail} from '../Middleware/firebase'
+import { getUser, uploadProfilePic , downloadProfilePic, toggleAllowEmail, getAllowEmail, addIcal} from '../Middleware/firebase'
 import addUser from '../Images/user_add.png'
 
 // Components for showing / editing the users informations
@@ -10,7 +10,8 @@ export default class MyAccount extends Component {
 
         this.state = {
             user: {},
-            allowEmail: false
+            allowEmail: false,
+            ical: ""
         }
 
         this.init()
@@ -36,7 +37,7 @@ export default class MyAccount extends Component {
                         <h3>{this.state.user.firstName + " " + this.state.user.name}</h3>
                         <div>E-mail : {this.state.user.email}</div>
                         <div>Promotion : {this.state.user.year}</div>
-                        <br />
+                        <div>Lien du calendrier : <input type="text" name="ical" value={this.state.user.ical || this.state.ical} onChange={(event) => this.setState({ical : event.target.value})}/> <button onClick={() => {addIcal(this.state.ical);}}>Utiliser</button></div>
                         <br />
                         <div>Autoriser l'envoi d'e-mail : <input type="checkbox" checked={this.state.allowEmail} onChange={async () => { await toggleAllowEmail(); this.setState({allowEmail: await getAllowEmail()})}}/></div>
                     </div>
@@ -60,10 +61,8 @@ const styles = {
     window: {
         position: 'absolute',
         backgroundColor: 'white',
-        width: "30%",
-        height: "30%",
         top: 70,
-        width: "30%",
+        width: "30%",   
         height: "30%",
         left: '35%',
         right: '35%',

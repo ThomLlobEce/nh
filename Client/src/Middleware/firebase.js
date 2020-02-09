@@ -265,8 +265,6 @@ export async function getUpcomingEventsLookingForHelpers(){
 export async function getNeedStatus(){
     let user = await getUser()
 
-    console.log(user)
-
     if(user.email !== ""){
         return await new Promise( (resolve, reject) => {
             db.collection("Users").get().then( function(querySnapshot) {
@@ -422,6 +420,9 @@ export async function downloadProfilePic(){
     return new Promise( async (resolve, reject) => {
         firebase.storage().ref().child((await getUser()).email).getDownloadURL().then( url => {
             resolve(url)
+        })
+        .catch(() => {
+            resolve("")
         })
     })
 }
