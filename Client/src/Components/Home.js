@@ -46,7 +46,6 @@ export default class App extends Component {
                             <FormSignIn 
                                 style={{zIndex: 2}} 
                                 inscription={() => this.setState({sign: false})}
-                                redirect = { () => this.setState({sign: true})}
                             />
                             :
                             <SignUp connexion = {() => this.setState({sign: true})} />
@@ -92,7 +91,7 @@ export default class App extends Component {
 const styles = {
     forms: {
         width: '100%',
-        height: '85vh',
+        height: '95vh',
         display: 'flex',
         backgroundImage: "url(https://www.bloghoptoys.fr/wp-content/uploads/2018/07/handicap-etudiant-mesures.jpg)",
         backgroundPosition: 'center',

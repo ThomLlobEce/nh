@@ -65,10 +65,11 @@ export default class FormSignUp extends Component {
             && this.state.error[5] === "" && this.state.error[6] === ""){
                 // The form is correctly formatted
                 // Creating user
-                let creation =  await createUser(this.state.email, this.state.password, this.state.cm, this.state.first_name, this.state.last_name, this.props.role, this.state.ufr, this.state.year )
-                console.log(creation)
-                if(creation){
+                if(await createUser(this.state.email, this.state.password, this.state.cm, this.state.first_name, this.state.last_name, this.props.role, this.state.ufr, this.state.year )){
                     this.props.connexion()
+                }
+                else{
+                    console.log("Create User return 0")
                 }
             
         }else{
@@ -87,8 +88,7 @@ export default class FormSignUp extends Component {
                         // Form must be printed
                         <div style={styles.formulaire}>
                             <button onClick={this.props.toggleSignUp} style={styles.cross}>X</button>
-                            <label style={styles.legend}><span style={styles.number}>1</span> Identité</label>
-                            <br/>
+                            <label style={styles.legend}><span style={styles.number}>1</span> Identité</label>  
                             <br/>
                             <input type="text" placeholder="Nom" style={styles.textArea} value={this.state.last_name} onChange = {(event) => {this.setState({last_name: event.target.value})}}/>
                             {this.state.error[0] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[0]}<br /></div>) : (<br />)}
@@ -101,7 +101,6 @@ export default class FormSignUp extends Component {
                             <br/>
                             <label style={styles.legend}><span style={styles.number}>2</span> Informations Etudiantes</label>
                             <br/>
-                            <br/>
                             <input type="text" placeholder="UFR" style={styles.textArea} value={this.state.ufr} onChange = {(event) => {this.setState({ufr: event.target.value})}}/>
                             {this.state.error[3] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[3]}<br /></div>) : (<br />)}
                             <br/>
@@ -111,13 +110,11 @@ export default class FormSignUp extends Component {
                             <input type="text" placeholder="CM" style={styles.textArea} value={this.state.cm} onChange = {(event) => {this.setState({cm: event.target.value})}}/>
                             {this.state.error[5] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[5]}<br /></div>) : (<br />)}
                             <br/>
-                            <br/>
                             <label style={styles.legend}><span style={styles.number}>3</span> Mot de passe</label>
-                            <br/>
                             <br/>
                             <input type="password" placeholder="Mot de passe" style={styles.textArea} value={this.state.password} onChange = {(event) => {this.setState({password: event.target.value})}}/>
                             {this.state.error[6] !== "" ?  (<div style={{color: 'red'}}>{this.state.error[6]}<br /></div>) : (<br />)}
-                            <br/>< br/>
+                            <br/>
                             <MouseOverButton text = {"Envoyer"} onClick = {this.createU} style_over = {styles.submitButton_over} style = {styles.submitButton} />
                         </div>
                         :
@@ -134,7 +131,7 @@ const styles = {
     formulaire: {
         width: 400,
         left: '50%',
-        top: '54%',
+        top: '60%',
         position: 'absolute',
         zIndex: 2,
     	padding: 20,

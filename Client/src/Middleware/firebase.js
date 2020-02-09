@@ -81,11 +81,11 @@ export async function getUser(){
 }
 
 export async function createUser(email, password, cm, firstName, name, need, ufr, year){
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(async function() {
-            console.log("User successfully created.")
+    return await new Promise( (resolve, reject) => {
+        firebase.auth().createUserWithEmailAndPassword(email, password)
+            .then(async function() {
+                console.log("User successfully created.")
 
-            return await new Promise( (resolve, reject) => {
                 db.collection("Users").doc(email).set({
                     cm: cm,
                     firstName: firstName,
@@ -103,13 +103,11 @@ export async function createUser(email, password, cm, firstName, name, need, ufr
                     resolve(false)
                 });
             })
-
-            return true
-        })
-        .catch(function(error) {
-            console.log(error.code + ": " + error.message )
-            return false
-        });
+            .catch(function(error) {
+                console.log(error.code + ": " + error.message )
+                resolve(false)
+            });
+    })
 }
 
 export async function signIn(email, password){
