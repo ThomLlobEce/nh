@@ -46,6 +46,7 @@ export default class App extends Component {
                             <FormSignIn 
                                 style={{zIndex: 2}} 
                                 inscription={() => this.setState({sign: false})}
+                                redirect = { () => this.setState({sign: true})}
                             />
                             :
                             <SignUp connexion = {() => this.setState({sign: true})} />
